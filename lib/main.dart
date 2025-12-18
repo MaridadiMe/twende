@@ -3,6 +3,7 @@ import 'package:flutter_application_1/features/auth/auth_gate.dart';
 import 'package:flutter_application_1/features/auth/screens/login_screen.dart';
 import 'package:flutter_application_1/features/auth/screens/register_screen.dart';
 import 'package:flutter_application_1/features/home/home_screen.dart';
+import 'package:flutter_application_1/features/trips/screens/search_trip_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -22,9 +23,13 @@ class MyApp extends StatelessWidget {
         '/login': (_) => const LoginScreen(),
         '/register': (_) => const RegisterScreen(),
         '/home': (_) => const HomeScreen(),
-        // '/search-trips': (_) => const SearchTripsScreen(),
+        '/search-trips': (_) => const SearchTripScreen(),
         // '/schedule-trip': (_) => const ScheduleTripScreen(),
       },
     );
   }
+}
+
+class SearchTripsScreen {
+  const SearchTripsScreen();
 }
