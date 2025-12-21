@@ -1,57 +1,107 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_places_flutter/google_places_flutter.dart';
 import '../models/trip.dart';
 import '../services/trip_service.dart';
 import '../../../core/api/api_client.dart';
+import 'package:geolocator/geolocator.dart';
 
 class SearchTripScreen extends StatefulWidget {
   const SearchTripScreen({super.key});
 
   @override
-  State<SearchTripScreen> createState() => _SearchTripScreenState();
+  State<SearchTripScreen> createState() => _SearchTripScreen();
 }
 
-class _SearchTripScreenState extends State<SearchTripScreen> {
-  final TextEditingController _pickupLatController = TextEditingController();
-  final TextEditingController _pickupLonController = TextEditingController();
-  final TextEditingController _dropLatController = TextEditingController();
-  final TextEditingController _dropLonController = TextEditingController();
-  final TextEditingController _radiusController = TextEditingController(
-    text: '1',
+class _SearchTripScreen extends State<SearchTripScreen> {
+  final TripService _tripService = TripService(ApiClient());
+  final Completer<GoogleMapController> _controller =
+      Completer<GoogleMapController>();
+
+  static const CameraPosition _kGooglePlex = CameraPosition(
+    target: LatLng(37.42796133580664, -122.085749655962),
+    zoom: 14.47,
   );
 
-  DateTime? _departureFrom;
-  DateTime? _departureTo;
+  final String googleApiKey = 'AIzaSyAkR1UUa5oJDKs92cX-BZsLkTAh86g9d6g';
+
+  double? pickupLat;
+  double? pickupLon;
+  double? dropLat;
+  double? dropLon;
+
+  DateTime? selectedDateTime;
+  DateTime get _departureFrom => selectedDateTime!;
+
+  DateTime get _departureTo =>
+      selectedDateTime!.add(const Duration(minutes: 30));
 
   bool _isLoading = false;
   List<Trip> _trips = [];
 
-  final TripService _tripService = TripService(ApiClient());
+  final pickupController = TextEditingController();
+  final destinationController = TextEditingController();
 
-  Future<void> _pickDateRange() async {
-    final picked = await showDateRangePicker(
+  final dateTimeController = TextEditingController();
+
+  Future<void> _moveCamera(double lat, double lng) async {
+    final controller = await _controller.future;
+    controller.animateCamera(CameraUpdate.newLatLngZoom(LatLng(lat, lng), 15));
+  }
+
+  Future<void> _pickDateTime() async {
+    final now = DateTime.now();
+
+    /// Pick date
+    final DateTime? date = await showDatePicker(
       context: context,
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 30)),
+      initialDate: now,
+      firstDate: now, // no past dates
+      lastDate: DateTime(now.year + 1),
     );
 
-    if (picked != null) {
-      setState(() {
-        _departureFrom = picked.start;
-        _departureTo = picked.end;
-      });
-    }
+    if (date == null) return;
+
+    /// Pick time
+    final TimeOfDay? time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+
+    if (time == null) return;
+
+    final DateTime combined = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      time.hour,
+      time.minute,
+    );
+
+    setState(() {
+      selectedDateTime = combined;
+      dateTimeController.text = _formatDateTime(combined);
+    });
+  }
+
+  String _formatDateTime(DateTime dt) {
+    return "${dt.day}/${dt.month}/${dt.year} "
+        "${dt.hour.toString().padLeft(2, '0')}:"
+        "${dt.minute.toString().padLeft(2, '0')}";
   }
 
   Future<void> _searchTrips() async {
-    if (_pickupLatController.text.isEmpty ||
-        _pickupLonController.text.isEmpty ||
-        _dropLatController.text.isEmpty ||
-        _dropLonController.text.isEmpty ||
-        _departureFrom == null ||
-        _departureTo == null) {
+    if (pickupLat == null ||
+        pickupLon == null ||
+        dropLat == null ||
+        dropLon == null ||
+        selectedDateTime == null) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Please fill all fields')));
+      ).showSnackBar(const SnackBar(content: Text("Please fill all fields")));
       return;
     }
 
@@ -59,16 +109,18 @@ class _SearchTripScreenState extends State<SearchTripScreen> {
 
     try {
       final trips = await _tripService.searchTrips(
-        pickupLat: double.parse(_pickupLatController.text),
-        pickupLon: double.parse(_pickupLonController.text),
-        dropLat: double.parse(_dropLatController.text),
-        dropLon: double.parse(_dropLonController.text),
-        departureFrom: _departureFrom!,
-        departureTo: _departureTo!,
-        radiusKm: double.parse(_radiusController.text),
+        pickupLat: pickupLat!,
+        pickupLon: pickupLon!,
+        dropLat: dropLat!,
+        dropLon: dropLon!,
+        departureFrom: _departureFrom,
+        departureTo: _departureTo,
+        radiusKm: 3, // Bolt-like default radius
       );
 
-      setState(() => _trips = trips);
+      setState(() {
+        _trips = trips;
+      });
     } catch (e) {
       ScaffoldMessenger.of(
         context,
@@ -78,89 +130,296 @@ class _SearchTripScreenState extends State<SearchTripScreen> {
     }
   }
 
+  late PolylinePoints polylinePoints;
+
+  Set<Polyline> _polylines = {};
+
+  LatLng? _currentLocation;
+
+  @override
+  void initState() {
+    super.initState();
+    _setInitialLocation();
+    polylinePoints = PolylinePoints(apiKey: googleApiKey);
+  }
+
+  Future<void> _setInitialLocation() async {
+    final position = await _getCurrentLocation();
+    setState(() {
+      _currentLocation = LatLng(position.latitude, position.longitude);
+    });
+  }
+
+  Future<Position> _getCurrentLocation() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      throw Exception('Location services are disabled.');
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        throw Exception('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      throw Exception('Location permissions are permanently denied.');
+    }
+
+    return await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+  }
+
+  Future<void> _drawRoute() async {
+    if (pickupLat == null ||
+        pickupLon == null ||
+        dropLat == null ||
+        dropLon == null)
+      return;
+
+    final result = await polylinePoints.getRouteBetweenCoordinates(
+      request: PolylineRequest(
+        origin: PointLatLng(pickupLat!, pickupLon!),
+        destination: PointLatLng(dropLat!, dropLon!),
+        mode: TravelMode.driving,
+      ),
+    );
+
+    if (result.points.isEmpty) return;
+
+    final points = result.points
+        .map((p) => LatLng(p.latitude, p.longitude))
+        .toList();
+
+    final polyline = Polyline(
+      polylineId: const PolylineId('trip_route'),
+      color: Colors.blue,
+      width: 5,
+      points: points,
+    );
+
+    setState(() {
+      _polylines = {polyline};
+    });
+
+    _fitMapToRoute(points);
+  }
+
+  Future<void> _fitMapToRoute(List<LatLng> points) async {
+    final controller = await _controller.future;
+
+    double minLat = points.first.latitude;
+    double maxLat = points.first.latitude;
+    double minLng = points.first.longitude;
+    double maxLng = points.first.longitude;
+
+    for (final p in points) {
+      minLat = minLat < p.latitude ? minLat : p.latitude;
+      maxLat = maxLat > p.latitude ? maxLat : p.latitude;
+      minLng = minLng < p.longitude ? minLng : p.longitude;
+      maxLng = maxLng > p.longitude ? maxLng : p.longitude;
+    }
+
+    controller.animateCamera(
+      CameraUpdate.newLatLngBounds(
+        LatLngBounds(
+          southwest: LatLng(minLat, minLng),
+          northeast: LatLng(maxLat, maxLng),
+        ),
+        60,
+      ),
+    );
+  }
+
+  void _drawAndSearch() {
+    _drawRoute();
+    _searchTrips();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Search Trips')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            TextField(
-              controller: _pickupLatController,
-              decoration: const InputDecoration(labelText: 'Pickup Latitude'),
-              keyboardType: TextInputType.number,
+      body: Stack(
+        children: [
+          /// 1️⃣ Map in the background
+          GoogleMap(
+            mapType: MapType.normal,
+            polylines: _polylines,
+            initialCameraPosition: CameraPosition(
+              target:
+                  _currentLocation ??
+                  LatLng(0, 0), // fallback if location not ready
+              zoom: 15,
             ),
-            TextField(
-              controller: _pickupLonController,
-              decoration: const InputDecoration(labelText: 'Pickup Longitude'),
-              keyboardType: TextInputType.number,
-            ),
-            TextField(
-              controller: _dropLatController,
-              decoration: const InputDecoration(labelText: 'Drop Latitude'),
-              keyboardType: TextInputType.number,
-            ),
-            TextField(
-              controller: _dropLonController,
-              decoration: const InputDecoration(labelText: 'Drop Longitude'),
-              keyboardType: TextInputType.number,
-            ),
-            TextField(
-              controller: _radiusController,
-              decoration: const InputDecoration(labelText: 'Radius (km)'),
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    _departureFrom != null
-                        ? 'From: ${_departureFrom!.toLocal()}'
-                        : 'Select departure range',
-                  ),
+            onMapCreated: (controller) {
+              _controller.complete(controller);
+            },
+            myLocationEnabled: true,
+            myLocationButtonEnabled: false,
+          ),
+
+          /// 2️⃣ Bolt-style bottom sheet
+          DraggableScrollableSheet(
+            initialChildSize: 0.25, // collapsed height
+            minChildSize: 0.15,
+            maxChildSize: 0.75, // expanded height
+            builder: (context, scrollController) {
+              return Container(
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                  boxShadow: [BoxShadow(blurRadius: 10, color: Colors.black26)],
                 ),
-                ElevatedButton(
-                  onPressed: _pickDateRange,
-                  child: const Text('Pick Dates'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _isLoading ? null : _searchTrips,
-                child: _isLoading
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text('Search'),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: _trips.isEmpty
-                  ? const Center(child: Text('No trips found'))
-                  : ListView.builder(
-                      itemCount: _trips.length,
-                      itemBuilder: (_, index) {
-                        final trip = _trips[index];
-                        return Card(
-                          child: ListTile(
-                            title: Text('Driver: ${trip.driverId}'),
-                            subtitle: Text(
-                              'Departure: ${trip.departureAt}\nSeats: ${trip.seatsAvailable} | Price: ${trip.price}',
-                            ),
-                            onTap: () {
-                              // TODO: Navigate to Trip Details / Booking
-                            },
-                          ),
+                child: ListView(
+                  controller: scrollController,
+                  padding: const EdgeInsets.all(16),
+                  children: [
+                    /// drag handle
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        margin: const EdgeInsets.only(bottom: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[400],
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
+
+                    /// pickup field
+                    GooglePlaceAutoCompleteTextField(
+                      textEditingController: pickupController,
+                      googleAPIKey: googleApiKey,
+                      inputDecoration: InputDecoration(
+                        hintText: "Pickup location",
+                        prefixIcon: const Icon(Icons.my_location),
+                        filled: true,
+                        fillColor: Colors.grey[100],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                      debounceTime: 400,
+                      countries: const ["tz"], // Tanzania
+                      isLatLngRequired: true,
+
+                      getPlaceDetailWithLatLng: (prediction) {
+                        final lat = double.parse(prediction.lat!);
+                        final lng = double.parse(prediction.lng!);
+
+                        setState(() {
+                          pickupLat = lat;
+                          pickupLon = lng;
+                        });
+
+                        _moveCamera(lat, lng);
+                      },
+
+                      itemClick: (prediction) {
+                        pickupController.text = prediction.description!;
+                        pickupController.selection = TextSelection.fromPosition(
+                          TextPosition(offset: pickupController.text.length),
                         );
                       },
                     ),
-            ),
-          ],
-        ),
+
+                    /// destination field
+                    const SizedBox(height: 12),
+
+                    GooglePlaceAutoCompleteTextField(
+                      textEditingController: destinationController,
+                      googleAPIKey: googleApiKey,
+                      inputDecoration: InputDecoration(
+                        hintText: "Where to?",
+                        prefixIcon: const Icon(Icons.location_on),
+                        filled: true,
+                        fillColor: Colors.grey[100],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                      debounceTime: 400,
+                      countries: const ["tz"],
+                      isLatLngRequired: true,
+
+                      getPlaceDetailWithLatLng: (prediction) {
+                        final lat = double.parse(prediction.lat!);
+                        final lng = double.parse(prediction.lng!);
+
+                        setState(() {
+                          dropLat = lat;
+                          dropLon = lng;
+                        });
+
+                        _moveCamera(lat, lng);
+                      },
+
+                      itemClick: (prediction) {
+                        destinationController.text = prediction.description!;
+                        destinationController.selection =
+                            TextSelection.fromPosition(
+                              TextPosition(
+                                offset: destinationController.text.length,
+                              ),
+                            );
+                      },
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    /// destination field
+                    TextField(
+                      decoration: InputDecoration(
+                        hintText: "Driver Distance?",
+                        prefixIcon: const Icon(Icons.radar),
+                        filled: true,
+                        fillColor: Colors.grey[100],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    /// destination field
+                    TextField(
+                      controller: dateTimeController,
+                      readOnly: true, // important
+                      onTap: _pickDateTime,
+                      decoration: InputDecoration(
+                        hintText: "Date and Time?",
+                        prefixIcon: const Icon(Icons.calendar_month),
+                        filled: true,
+                        fillColor: Colors.grey[100],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    ElevatedButton(
+                      onPressed: _isLoading ? null : _drawAndSearch,
+                      child: _isLoading
+                          ? const CircularProgressIndicator()
+                          : const Text("Search Trips"),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }

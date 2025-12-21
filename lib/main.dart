@@ -4,8 +4,10 @@ import 'package:flutter_application_1/features/auth/screens/login_screen.dart';
 import 'package:flutter_application_1/features/auth/screens/register_screen.dart';
 import 'package:flutter_application_1/features/home/home_screen.dart';
 import 'package:flutter_application_1/features/trips/screens/search_trip_screen.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() {
+void main() async {
+  //await dotenv.load(fileName: ".env");
   runApp(MyApp());
 }
 
