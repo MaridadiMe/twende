@@ -53,7 +53,7 @@ class _SearchTripScreen extends State<SearchTripScreen> {
     controller.animateCamera(CameraUpdate.newLatLngZoom(LatLng(lat, lng), 15));
   }
 
-  SearchState _searchState = SearchState.form;
+  TripSheetView _currentView = TripSheetView.searchForm;
 
   Future<void> _pickDateTime() async {
     final now = DateTime.now();
@@ -124,13 +124,13 @@ class _SearchTripScreen extends State<SearchTripScreen> {
       setState(() {
         _trips = trips;
         if (trips.isNotEmpty) {
-          _searchState = SearchState.results;
+          _currentView = TripSheetView.results;
         } else {
-          _searchState = SearchState.form;
+          _currentView = TripSheetView.searchForm;
         }
       });
     } catch (e) {
-      setState(() => _searchState = SearchState.form);
+      setState(() => _currentView = TripSheetView.searchForm);
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Error searching trips: $e')));
@@ -249,29 +249,87 @@ class _SearchTripScreen extends State<SearchTripScreen> {
     _searchTrips();
   }
 
-  Widget _buildTripResults() {
+  Widget _buildTripResults(ScrollController scrollController) {
     if (_trips.isEmpty) {
       return const Center(child: Text("No trips found"));
     }
 
-    return ListView.builder(
-      itemCount: _trips.length,
-      itemBuilder: (context, index) {
-        final trip = _trips[index];
-
-        return Card(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: ListTile(
-            leading: const Icon(Icons.directions_bus),
-            title: Text("${trip.startAddress} → ${trip.endAddress}"),
-            subtitle: Text("Departs at ${_formatTime(trip.departureAt)}"),
-            trailing: Text("${trip.price} TZS"),
-            onTap: () {
-              _onTripSelected(trip);
-            },
+    return ListView(
+      controller: scrollController,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      children: [
+        /// drag handle
+        Center(
+          child: Container(
+            width: 40,
+            height: 4,
+            margin: const EdgeInsets.only(bottom: 16, top: 8),
+            decoration: BoxDecoration(
+              color: Colors.grey[400],
+              borderRadius: BorderRadius.circular(2),
+            ),
           ),
-        );
-      },
+        ),
+
+        TextButton.icon(
+          onPressed: () =>
+              setState(() => _currentView = TripSheetView.searchForm),
+          icon: const Icon(Icons.arrow_back),
+          label: const Text("Back to search"),
+        ),
+
+        ..._trips.map((trip) {
+          return Container(
+            margin: const EdgeInsets.only(bottom: 10),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade50,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey.shade200),
+            ),
+            child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 6,
+              ),
+
+              leading: const Icon(
+                Icons.directions_car,
+                color: Color(0xFF6200EE),
+                size: 22,
+              ),
+
+              title: Text(
+                "${trip.startAddress} → ${trip.endAddress}",
+                style: const TextStyle(
+                  fontSize: 14, // ↓ smaller than default
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+
+              subtitle: Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  "Departs: ${_formatDateTime(trip.departureAt)}",
+                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                ),
+              ),
+
+              trailing: Text(
+                "${trip.price} TZS",
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
+              onTap: () => setState(() {
+                _selectedTrip = trip;
+                _currentView = TripSheetView.details;
+              }),
+            ),
+          );
+        }).toList(),
+      ],
     );
   }
 
@@ -281,36 +339,115 @@ class _SearchTripScreen extends State<SearchTripScreen> {
     return '$hour:$minute';
   }
 
-  void _onTripSelected(Trip trip) {
-    // _drawRoute(
-    //   startLat: trip.startLat,
-    //   startLon: trip.startLon,
-    //   endLat: trip.endLat,
-    //   endLon: trip.endLon,
-    // );
+  Trip? _selectedTrip;
 
-    // optional: collapse sheet
-    return;
+  Widget _buildTripDetails(ScrollController scrollController) {
+    if (_selectedTrip == null) return const SizedBox();
+
+    final trip = _selectedTrip!;
+
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      controller: scrollController,
+      children: [
+        Center(
+          child: Container(
+            width: 40,
+            height: 4,
+            margin: const EdgeInsets.only(bottom: 16),
+            decoration: BoxDecoration(
+              color: Colors.grey[400],
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+        ),
+        TextButton.icon(
+          onPressed: () => setState(() => _currentView = TripSheetView.results),
+          icon: const Icon(Icons.arrow_back),
+          label: const Text("Back to results"),
+        ),
+        const SizedBox(height: 12),
+
+        Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          elevation: 2,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "${trip.startAddress} → ${trip.endAddress}",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text("Departure: ${_formatDateTime(trip.departureAt)}"),
+                Text("Price: ${trip.price} TZS"),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    // proceed to booking
+                    _bookTrip(trip);
+                  },
+                  child: const Text("Book Trip"),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
   }
+
+  void _bookTrip(Trip trip) {
+    // Implement booking logic here
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('Booking trip ID: ${trip.id}')));
+  }
+
+  // Widget _buildBottomSheetContent(
+  //   BuildContext context,
+  //   ScrollController scrollController,
+  // ) {
+  //   switch (_currentView) {
+  //     case TripSheetView.searchForm:
+  //       return _buildSearchForm(context, scrollController);
+
+  //     case TripSheetView.loading:
+  //       return const Center(
+  //         child: Padding(
+  //           padding: EdgeInsets.all(24),
+  //           child: CircularProgressIndicator(),
+  //         ),
+  //       );
+
+  //     case TripSheetView.results:
+  //       return _buildTripResults(scrollController);
+
+  //     default:
+  //       return _buildSearchForm(context, scrollController);
+  //   }
+  // }
 
   Widget _buildBottomSheetContent(
     BuildContext context,
     ScrollController scrollController,
   ) {
-    switch (_searchState) {
-      case SearchState.form:
+    switch (_currentView) {
+      case TripSheetView.searchForm:
         return _buildSearchForm(context, scrollController);
-
-      case SearchState.loading:
-        return const Center(
-          child: Padding(
-            padding: EdgeInsets.all(24),
-            child: CircularProgressIndicator(),
-          ),
-        );
-
-      case SearchState.results:
-        return _buildTripResults();
+      case TripSheetView.results:
+        return _buildTripResults(scrollController);
+      case TripSheetView.details:
+        return _buildTripDetails(scrollController);
+      default:
+        return _buildSearchForm(context, scrollController);
     }
   }
 
