@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/features/trips/enums/search_trip.enum.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
@@ -51,6 +52,8 @@ class _SearchTripScreen extends State<SearchTripScreen> {
     final controller = await _controller.future;
     controller.animateCamera(CameraUpdate.newLatLngZoom(LatLng(lat, lng), 15));
   }
+
+  SearchState _searchState = SearchState.form;
 
   Future<void> _pickDateTime() async {
     final now = DateTime.now();
@@ -120,8 +123,14 @@ class _SearchTripScreen extends State<SearchTripScreen> {
 
       setState(() {
         _trips = trips;
+        if (trips.isNotEmpty) {
+          _searchState = SearchState.results;
+        } else {
+          _searchState = SearchState.form;
+        }
       });
     } catch (e) {
+      setState(() => _searchState = SearchState.form);
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Error searching trips: $e')));
@@ -177,8 +186,9 @@ class _SearchTripScreen extends State<SearchTripScreen> {
     if (pickupLat == null ||
         pickupLon == null ||
         dropLat == null ||
-        dropLon == null)
+        dropLon == null) {
       return;
+    }
 
     final result = await polylinePoints.getRouteBetweenCoordinates(
       request: PolylineRequest(
@@ -239,6 +249,217 @@ class _SearchTripScreen extends State<SearchTripScreen> {
     _searchTrips();
   }
 
+  Widget _buildTripResults() {
+    if (_trips.isEmpty) {
+      return const Center(child: Text("No trips found"));
+    }
+
+    return ListView.builder(
+      itemCount: _trips.length,
+      itemBuilder: (context, index) {
+        final trip = _trips[index];
+
+        return Card(
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: ListTile(
+            leading: const Icon(Icons.directions_bus),
+            title: Text("${trip.startAddress} → ${trip.endAddress}"),
+            subtitle: Text("Departs at ${_formatTime(trip.departureAt)}"),
+            trailing: Text("${trip.price} TZS"),
+            onTap: () {
+              _onTripSelected(trip);
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  String _formatTime(DateTime dateTime) {
+    final hour = dateTime.hour.toString().padLeft(2, '0');
+    final minute = dateTime.minute.toString().padLeft(2, '0');
+    return '$hour:$minute';
+  }
+
+  void _onTripSelected(Trip trip) {
+    // _drawRoute(
+    //   startLat: trip.startLat,
+    //   startLon: trip.startLon,
+    //   endLat: trip.endLat,
+    //   endLon: trip.endLon,
+    // );
+
+    // optional: collapse sheet
+    return;
+  }
+
+  Widget _buildBottomSheetContent(
+    BuildContext context,
+    ScrollController scrollController,
+  ) {
+    switch (_searchState) {
+      case SearchState.form:
+        return _buildSearchForm(context, scrollController);
+
+      case SearchState.loading:
+        return const Center(
+          child: Padding(
+            padding: EdgeInsets.all(24),
+            child: CircularProgressIndicator(),
+          ),
+        );
+
+      case SearchState.results:
+        return _buildTripResults();
+    }
+  }
+
+  Widget _buildSearchForm(
+    BuildContext context,
+    ScrollController scrollController,
+  ) {
+    return ListView(
+      controller: scrollController,
+      padding: const EdgeInsets.all(16),
+      children: [
+        /// drag handle
+        Center(
+          child: Container(
+            width: 40,
+            height: 4,
+            margin: const EdgeInsets.only(bottom: 16),
+            decoration: BoxDecoration(
+              color: Colors.grey[400],
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+        ),
+
+        /// pickup field
+        GooglePlaceAutoCompleteTextField(
+          textEditingController: pickupController,
+          googleAPIKey: googleApiKey,
+          inputDecoration: InputDecoration(
+            hintText: "Pickup location",
+            prefixIcon: const Icon(Icons.my_location),
+            filled: true,
+            fillColor: Colors.grey[100],
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+          ),
+          debounceTime: 400,
+          countries: const ["tz"], // Tanzania
+          isLatLngRequired: true,
+
+          getPlaceDetailWithLatLng: (prediction) {
+            final lat = double.parse(prediction.lat!);
+            final lng = double.parse(prediction.lng!);
+
+            setState(() {
+              pickupLat = lat;
+              pickupLon = lng;
+            });
+
+            _moveCamera(lat, lng);
+          },
+
+          itemClick: (prediction) {
+            pickupController.text = prediction.description!;
+            pickupController.selection = TextSelection.fromPosition(
+              TextPosition(offset: pickupController.text.length),
+            );
+          },
+        ),
+
+        /// destination field
+        const SizedBox(height: 12),
+
+        GooglePlaceAutoCompleteTextField(
+          textEditingController: destinationController,
+          googleAPIKey: googleApiKey,
+          inputDecoration: InputDecoration(
+            hintText: "Where to?",
+            prefixIcon: const Icon(Icons.location_on),
+            filled: true,
+            fillColor: Colors.grey[100],
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+          ),
+          debounceTime: 400,
+          countries: const ["tz"],
+          isLatLngRequired: true,
+
+          getPlaceDetailWithLatLng: (prediction) {
+            final lat = double.parse(prediction.lat!);
+            final lng = double.parse(prediction.lng!);
+
+            setState(() {
+              dropLat = lat;
+              dropLon = lng;
+            });
+
+            _moveCamera(lat, lng);
+          },
+
+          itemClick: (prediction) {
+            destinationController.text = prediction.description!;
+            destinationController.selection = TextSelection.fromPosition(
+              TextPosition(offset: destinationController.text.length),
+            );
+          },
+        ),
+
+        const SizedBox(height: 12),
+
+        /// destination field
+        TextField(
+          decoration: InputDecoration(
+            hintText: "Driver Distance?",
+            prefixIcon: const Icon(Icons.radar),
+            filled: true,
+            fillColor: Colors.grey[100],
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 12),
+
+        /// destination field
+        TextField(
+          controller: dateTimeController,
+          readOnly: true, // important
+          onTap: _pickDateTime,
+          decoration: InputDecoration(
+            hintText: "Date and Time?",
+            prefixIcon: const Icon(Icons.calendar_month),
+            filled: true,
+            fillColor: Colors.grey[100],
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 20),
+
+        ElevatedButton(
+          onPressed: _isLoading ? null : _drawAndSearch,
+          child: _isLoading
+              ? const CircularProgressIndicator()
+              : const Text("Search Trips"),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -273,149 +494,7 @@ class _SearchTripScreen extends State<SearchTripScreen> {
                   borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                   boxShadow: [BoxShadow(blurRadius: 10, color: Colors.black26)],
                 ),
-                child: ListView(
-                  controller: scrollController,
-                  padding: const EdgeInsets.all(16),
-                  children: [
-                    /// drag handle
-                    Center(
-                      child: Container(
-                        width: 40,
-                        height: 4,
-                        margin: const EdgeInsets.only(bottom: 16),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[400],
-                          borderRadius: BorderRadius.circular(2),
-                        ),
-                      ),
-                    ),
-
-                    /// pickup field
-                    GooglePlaceAutoCompleteTextField(
-                      textEditingController: pickupController,
-                      googleAPIKey: googleApiKey,
-                      inputDecoration: InputDecoration(
-                        hintText: "Pickup location",
-                        prefixIcon: const Icon(Icons.my_location),
-                        filled: true,
-                        fillColor: Colors.grey[100],
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                      debounceTime: 400,
-                      countries: const ["tz"], // Tanzania
-                      isLatLngRequired: true,
-
-                      getPlaceDetailWithLatLng: (prediction) {
-                        final lat = double.parse(prediction.lat!);
-                        final lng = double.parse(prediction.lng!);
-
-                        setState(() {
-                          pickupLat = lat;
-                          pickupLon = lng;
-                        });
-
-                        _moveCamera(lat, lng);
-                      },
-
-                      itemClick: (prediction) {
-                        pickupController.text = prediction.description!;
-                        pickupController.selection = TextSelection.fromPosition(
-                          TextPosition(offset: pickupController.text.length),
-                        );
-                      },
-                    ),
-
-                    /// destination field
-                    const SizedBox(height: 12),
-
-                    GooglePlaceAutoCompleteTextField(
-                      textEditingController: destinationController,
-                      googleAPIKey: googleApiKey,
-                      inputDecoration: InputDecoration(
-                        hintText: "Where to?",
-                        prefixIcon: const Icon(Icons.location_on),
-                        filled: true,
-                        fillColor: Colors.grey[100],
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                      debounceTime: 400,
-                      countries: const ["tz"],
-                      isLatLngRequired: true,
-
-                      getPlaceDetailWithLatLng: (prediction) {
-                        final lat = double.parse(prediction.lat!);
-                        final lng = double.parse(prediction.lng!);
-
-                        setState(() {
-                          dropLat = lat;
-                          dropLon = lng;
-                        });
-
-                        _moveCamera(lat, lng);
-                      },
-
-                      itemClick: (prediction) {
-                        destinationController.text = prediction.description!;
-                        destinationController.selection =
-                            TextSelection.fromPosition(
-                              TextPosition(
-                                offset: destinationController.text.length,
-                              ),
-                            );
-                      },
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    /// destination field
-                    TextField(
-                      decoration: InputDecoration(
-                        hintText: "Driver Distance?",
-                        prefixIcon: const Icon(Icons.radar),
-                        filled: true,
-                        fillColor: Colors.grey[100],
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    /// destination field
-                    TextField(
-                      controller: dateTimeController,
-                      readOnly: true, // important
-                      onTap: _pickDateTime,
-                      decoration: InputDecoration(
-                        hintText: "Date and Time?",
-                        prefixIcon: const Icon(Icons.calendar_month),
-                        filled: true,
-                        fillColor: Colors.grey[100],
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    ElevatedButton(
-                      onPressed: _isLoading ? null : _drawAndSearch,
-                      child: _isLoading
-                          ? const CircularProgressIndicator()
-                          : const Text("Search Trips"),
-                    ),
-                  ],
-                ),
+                child: _buildBottomSheetContent(context, scrollController),
               );
             },
           ),
