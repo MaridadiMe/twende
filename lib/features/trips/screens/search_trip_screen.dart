@@ -123,11 +123,7 @@ class _SearchTripScreen extends State<SearchTripScreen> {
 
       setState(() {
         _trips = trips;
-        if (trips.isNotEmpty) {
-          _currentView = TripSheetView.results;
-        } else {
-          _currentView = TripSheetView.searchForm;
-        }
+        _currentView = TripSheetView.results;
       });
     } catch (e) {
       setState(() => _currentView = TripSheetView.searchForm);
@@ -250,9 +246,9 @@ class _SearchTripScreen extends State<SearchTripScreen> {
   }
 
   Widget _buildTripResults(ScrollController scrollController) {
-    if (_trips.isEmpty) {
-      return const Center(child: Text("No trips found"));
-    }
+    // if (_trips.isEmpty) {
+    //   return const Center(child: Text("No trips found"));
+    // }
 
     return ListView(
       controller: scrollController,
@@ -277,6 +273,8 @@ class _SearchTripScreen extends State<SearchTripScreen> {
           icon: const Icon(Icons.arrow_back),
           label: const Text("Back to search"),
         ),
+
+        if (_trips.isEmpty) Center(child: Text("No trips found")),
 
         ..._trips.map((trip) {
           return Container(
@@ -341,6 +339,100 @@ class _SearchTripScreen extends State<SearchTripScreen> {
 
   Trip? _selectedTrip;
 
+  // Widget _buildTripDetails(ScrollController scrollController) {
+  //   if (_selectedTrip == null) return const SizedBox();
+
+  //   final trip = _selectedTrip!;
+
+  //   return ListView(
+  //     padding: const EdgeInsets.all(16),
+  //     controller: scrollController,
+  //     children: [
+  //       Center(
+  //         child: Container(
+  //           width: 40,
+  //           height: 4,
+  //           margin: const EdgeInsets.only(bottom: 16),
+  //           decoration: BoxDecoration(
+  //             color: Colors.grey[400],
+  //             borderRadius: BorderRadius.circular(2),
+  //           ),
+  //         ),
+  //       ),
+  //       TextButton.icon(
+  //         onPressed: () => setState(() => _currentView = TripSheetView.results),
+  //         icon: const Icon(Icons.arrow_back),
+  //         label: const Text("Back to results"),
+  //       ),
+  //       const SizedBox(height: 12),
+
+  //       Card(
+  //         shape: RoundedRectangleBorder(
+  //           borderRadius: BorderRadius.circular(12),
+  //         ),
+  //         elevation: 2,
+  //         child: Padding(
+  //           padding: const EdgeInsets.all(16),
+  //           child: Column(
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: [
+  //               Text(
+  //                 "${trip.startAddress} → ${trip.endAddress}",
+  //                 style: const TextStyle(
+  //                   fontSize: 16,
+  //                   fontWeight: FontWeight.bold,
+  //                 ),
+  //               ),
+  //               const SizedBox(height: 8),
+  //               Text("Departure: ${_formatDateTime(trip.departureAt)}"),
+  //               Text("Price: ${trip.price} TZS"),
+  //               const SizedBox(height: 16),
+  //               ElevatedButton(
+  //                 onPressed: () {
+  //                   // proceed to booking
+  //                   _bookTrip(trip);
+  //                 },
+  //                 child: const Text("Book Trip"),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
+
+  void _bookTrip(Trip trip) {
+    // Implement booking logic here
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('Booking trip ID: ${trip.id}')));
+  }
+
+  // Widget _buildBottomSheetContent(
+  //   BuildContext context,
+  //   ScrollController scrollController,
+  // ) {
+  //   switch (_currentView) {
+  //     case TripSheetView.searchForm:
+  //       return _buildSearchForm(context, scrollController);
+
+  //     case TripSheetView.loading:
+  //       return const Center(
+  //         child: Padding(
+  //           padding: EdgeInsets.all(24),
+  //           child: CircularProgressIndicator(),
+  //         ),
+  //       );
+
+  //     case TripSheetView.results:
+  //       return _buildTripResults(scrollController);
+
+  //     default:
+  //       return _buildSearchForm(context, scrollController);
+  //   }
+  // }
+
   Widget _buildTripDetails(ScrollController scrollController) {
     if (_selectedTrip == null) return const SizedBox();
 
@@ -378,6 +470,7 @@ class _SearchTripScreen extends State<SearchTripScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Trip route and date
                 Text(
                   "${trip.startAddress} → ${trip.endAddress}",
                   style: const TextStyle(
@@ -387,11 +480,67 @@ class _SearchTripScreen extends State<SearchTripScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text("Departure: ${_formatDateTime(trip.departureAt)}"),
-                Text("Price: ${trip.price} TZS"),
+
+                // Driver Details Section
                 const SizedBox(height: 16),
+                Row(
+                  children: [
+                    // Placeholder for Driver Profile Picture
+                    CircleAvatar(
+                      radius: 20,
+                      backgroundColor: Colors.grey[300],
+                      child: const Icon(Icons.person, color: Colors.white),
+                    ),
+                    const SizedBox(width: 12),
+                    // Driver Name and Rating
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Driver: John Doe", // Placeholder name
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.star,
+                              color: Colors.amber,
+                              size: 16,
+                            ),
+                            const SizedBox(width: 4),
+                            Text("4.8"), // Placeholder rating
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 16),
+
+                // Price and Available Seats
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Price: ${trip.price.toStringAsFixed(2)} TZS",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      "Seats Available: ${trip.seatsAvailable} / ${trip.seatsTotal}",
+                      style: const TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Book Trip Button
                 ElevatedButton(
                   onPressed: () {
-                    // proceed to booking
+                    // Proceed to booking
                     _bookTrip(trip);
                   },
                   child: const Text("Book Trip"),
@@ -403,37 +552,6 @@ class _SearchTripScreen extends State<SearchTripScreen> {
       ],
     );
   }
-
-  void _bookTrip(Trip trip) {
-    // Implement booking logic here
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('Booking trip ID: ${trip.id}')));
-  }
-
-  // Widget _buildBottomSheetContent(
-  //   BuildContext context,
-  //   ScrollController scrollController,
-  // ) {
-  //   switch (_currentView) {
-  //     case TripSheetView.searchForm:
-  //       return _buildSearchForm(context, scrollController);
-
-  //     case TripSheetView.loading:
-  //       return const Center(
-  //         child: Padding(
-  //           padding: EdgeInsets.all(24),
-  //           child: CircularProgressIndicator(),
-  //         ),
-  //       );
-
-  //     case TripSheetView.results:
-  //       return _buildTripResults(scrollController);
-
-  //     default:
-  //       return _buildSearchForm(context, scrollController);
-  //   }
-  // }
 
   Widget _buildBottomSheetContent(
     BuildContext context,
