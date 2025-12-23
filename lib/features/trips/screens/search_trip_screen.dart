@@ -152,6 +152,10 @@ class _SearchTripScreen extends State<SearchTripScreen> {
     final position = await _getCurrentLocation();
     setState(() {
       _currentLocation = LatLng(position.latitude, position.longitude);
+      print('CURRENT LOCATION: ${position.latitude}, ${position.longitude}');
+      print(
+        '====================================================================================================',
+      );
     });
   }
 
@@ -727,7 +731,10 @@ class _SearchTripScreen extends State<SearchTripScreen> {
             initialCameraPosition: CameraPosition(
               target:
                   _currentLocation ??
-                  LatLng(0, 0), // fallback if location not ready
+                  LatLng(
+                    -6.7726389,
+                    39.2170875,
+                  ), // fallback if location not ready
               zoom: 15,
             ),
             onMapCreated: (controller) {
