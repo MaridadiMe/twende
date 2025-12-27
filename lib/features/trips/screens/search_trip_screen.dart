@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/features/trips/enums/search_trip.enum.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -152,10 +153,6 @@ class _SearchTripScreen extends State<SearchTripScreen> {
     final position = await _getCurrentLocation();
     setState(() {
       _currentLocation = LatLng(position.latitude, position.longitude);
-      print('CURRENT LOCATION: ${position.latitude}, ${position.longitude}');
-      print(
-        '====================================================================================================',
-      );
     });
   }
 
@@ -343,74 +340,17 @@ class _SearchTripScreen extends State<SearchTripScreen> {
 
   Trip? _selectedTrip;
 
-  // Widget _buildTripDetails(ScrollController scrollController) {
-  //   if (_selectedTrip == null) return const SizedBox();
-
-  //   final trip = _selectedTrip!;
-
-  //   return ListView(
-  //     padding: const EdgeInsets.all(16),
-  //     controller: scrollController,
-  //     children: [
-  //       Center(
-  //         child: Container(
-  //           width: 40,
-  //           height: 4,
-  //           margin: const EdgeInsets.only(bottom: 16),
-  //           decoration: BoxDecoration(
-  //             color: Colors.grey[400],
-  //             borderRadius: BorderRadius.circular(2),
-  //           ),
-  //         ),
-  //       ),
-  //       TextButton.icon(
-  //         onPressed: () => setState(() => _currentView = TripSheetView.results),
-  //         icon: const Icon(Icons.arrow_back),
-  //         label: const Text("Back to results"),
-  //       ),
-  //       const SizedBox(height: 12),
-
-  //       Card(
-  //         shape: RoundedRectangleBorder(
-  //           borderRadius: BorderRadius.circular(12),
-  //         ),
-  //         elevation: 2,
-  //         child: Padding(
-  //           padding: const EdgeInsets.all(16),
-  //           child: Column(
-  //             crossAxisAlignment: CrossAxisAlignment.start,
-  //             children: [
-  //               Text(
-  //                 "${trip.startAddress} → ${trip.endAddress}",
-  //                 style: const TextStyle(
-  //                   fontSize: 16,
-  //                   fontWeight: FontWeight.bold,
-  //                 ),
-  //               ),
-  //               const SizedBox(height: 8),
-  //               Text("Departure: ${_formatDateTime(trip.departureAt)}"),
-  //               Text("Price: ${trip.price} TZS"),
-  //               const SizedBox(height: 16),
-  //               ElevatedButton(
-  //                 onPressed: () {
-  //                   // proceed to booking
-  //                   _bookTrip(trip);
-  //                 },
-  //                 child: const Text("Book Trip"),
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
-
-  void _bookTrip(Trip trip) {
-    // Implement booking logic here
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('Booking trip ID: ${trip.id}')));
+  Future<void> _bookTrip(Trip trip, int seats) async {
+    try {
+      final booking = await _tripService.bookTrip(seats: 1, tripId: trip.id);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Booking Successful: ${booking.id}')),
+      );
+    } on DioException catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(ApiClient.extractErrorMessage(e))));
+    }
   }
 
   // Widget _buildBottomSheetContent(
@@ -545,7 +485,7 @@ class _SearchTripScreen extends State<SearchTripScreen> {
                 ElevatedButton(
                   onPressed: () {
                     // Proceed to booking
-                    _bookTrip(trip);
+                    _bookTrip(trip, 1);
                   },
                   child: const Text("Book Trip"),
                 ),
