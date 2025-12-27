@@ -353,30 +353,6 @@ class _SearchTripScreen extends State<SearchTripScreen> {
     }
   }
 
-  // Widget _buildBottomSheetContent(
-  //   BuildContext context,
-  //   ScrollController scrollController,
-  // ) {
-  //   switch (_currentView) {
-  //     case TripSheetView.searchForm:
-  //       return _buildSearchForm(context, scrollController);
-
-  //     case TripSheetView.loading:
-  //       return const Center(
-  //         child: Padding(
-  //           padding: EdgeInsets.all(24),
-  //           child: CircularProgressIndicator(),
-  //         ),
-  //       );
-
-  //     case TripSheetView.results:
-  //       return _buildTripResults(scrollController);
-
-  //     default:
-  //       return _buildSearchForm(context, scrollController);
-  //   }
-  // }
-
   Widget _buildTripDetails(ScrollController scrollController) {
     if (_selectedTrip == null) return const SizedBox();
 
@@ -615,20 +591,20 @@ class _SearchTripScreen extends State<SearchTripScreen> {
         const SizedBox(height: 12),
 
         /// destination field
-        TextField(
-          decoration: InputDecoration(
-            hintText: "Driver Distance?",
-            prefixIcon: const Icon(Icons.radar),
-            filled: true,
-            fillColor: Colors.grey[100],
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-          ),
-        ),
+        // TextField(
+        //   decoration: InputDecoration(
+        //     hintText: "Driver Distance?",
+        //     prefixIcon: const Icon(Icons.radar),
+        //     filled: true,
+        //     fillColor: Colors.grey[100],
+        //     border: OutlineInputBorder(
+        //       borderRadius: BorderRadius.circular(12),
+        //       borderSide: BorderSide.none,
+        //     ),
+        //   ),
+        // ),
 
-        const SizedBox(height: 12),
+        // const SizedBox(height: 12),
 
         /// destination field
         TextField(

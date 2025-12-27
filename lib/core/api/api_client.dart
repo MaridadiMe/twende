@@ -35,7 +35,14 @@ class ApiClient {
     return e.message ?? 'Network error occurred';
   }
 
-  void _onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+  void _onRequest(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
+    final token = await AuthStorage.getToken();
+    if (token != null) {
+      options.headers['Authorization'] = 'Bearer $token';
+    }
     debugPrint('➡️ REQUEST');
     debugPrint('${options.method} ${options.uri}');
     debugPrint('Headers: ${options.headers}');
