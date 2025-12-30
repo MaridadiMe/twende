@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/core/theme/dark_theme.dart';
+import 'package:flutter_application_1/core/theme/light_theme.dart';
 import 'package:flutter_application_1/features/auth/auth_gate.dart';
 import 'package:flutter_application_1/features/auth/screens/login_screen.dart';
 import 'package:flutter_application_1/features/auth/screens/register_screen.dart';
 import 'package:flutter_application_1/features/home/home_screen.dart';
-import 'package:flutter_application_1/features/trips/screens/search_trip_screen.dart';
+import 'package:flutter_application_1/features/trips/screens/search_trip/search_trip_screen.dart';
 
 void main() async {
   //await dotenv.load(fileName: ".env");
@@ -18,7 +20,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: "Ride Sharing App",
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
+      theme: lightTheme,
+      darkTheme: darkTheme,
+      themeMode: ThemeMode.system,
       home: const AuthGate(),
       routes: {
         '/login': (_) => const LoginScreen(),

@@ -2,13 +2,13 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/features/trips/enums/search_trip.enum.dart';
+import 'package:flutter_application_1/features/trips/enums/bottom_sheet_view.enum.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
-import '../models/trip.dart';
-import '../services/trip_service.dart';
-import '../../../core/api/api_client.dart';
+import '../../models/trip.dart';
+import '../../services/trip_service.dart';
+import '../../../../core/api/api_client.dart';
 import 'package:geolocator/geolocator.dart';
 
 class SearchTripScreen extends StatefulWidget {
@@ -54,7 +54,7 @@ class _SearchTripScreen extends State<SearchTripScreen> {
     controller.animateCamera(CameraUpdate.newLatLngZoom(LatLng(lat, lng), 15));
   }
 
-  TripSheetView _currentView = TripSheetView.searchForm;
+  BottomSheetView _currentView = BottomSheetView.searchForm;
 
   Future<void> _pickDateTime() async {
     final now = DateTime.now();
@@ -124,10 +124,10 @@ class _SearchTripScreen extends State<SearchTripScreen> {
 
       setState(() {
         _trips = trips;
-        _currentView = TripSheetView.results;
+        _currentView = BottomSheetView.results;
       });
     } catch (e) {
-      setState(() => _currentView = TripSheetView.searchForm);
+      setState(() => _currentView = BottomSheetView.searchForm);
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Error searching trips: $e')));
@@ -270,7 +270,7 @@ class _SearchTripScreen extends State<SearchTripScreen> {
 
         TextButton.icon(
           onPressed: () =>
-              setState(() => _currentView = TripSheetView.searchForm),
+              setState(() => _currentView = BottomSheetView.searchForm),
           icon: const Icon(Icons.arrow_back),
           label: const Text("Back to search"),
         ),
@@ -323,7 +323,7 @@ class _SearchTripScreen extends State<SearchTripScreen> {
 
               onTap: () => setState(() {
                 _selectedTrip = trip;
-                _currentView = TripSheetView.details;
+                _currentView = BottomSheetView.details;
               }),
             ),
           );
@@ -374,7 +374,8 @@ class _SearchTripScreen extends State<SearchTripScreen> {
           ),
         ),
         TextButton.icon(
-          onPressed: () => setState(() => _currentView = TripSheetView.results),
+          onPressed: () =>
+              setState(() => _currentView = BottomSheetView.results),
           icon: const Icon(Icons.arrow_back),
           label: const Text("Back to results"),
         ),
@@ -478,11 +479,11 @@ class _SearchTripScreen extends State<SearchTripScreen> {
     ScrollController scrollController,
   ) {
     switch (_currentView) {
-      case TripSheetView.searchForm:
+      case BottomSheetView.searchForm:
         return _buildSearchForm(context, scrollController);
-      case TripSheetView.results:
+      case BottomSheetView.results:
         return _buildTripResults(scrollController);
-      case TripSheetView.details:
+      case BottomSheetView.details:
         return _buildTripDetails(scrollController);
       default:
         return _buildSearchForm(context, scrollController);

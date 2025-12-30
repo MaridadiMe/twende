@@ -81,36 +81,31 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
-  #
-  # For details regarding fonts from package dependencies,
-  # see https://flutter.dev/to/font-from-package
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Regular.ttf
+        - asset: assets/fonts/Inter-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Inter-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Inter-Bold.ttf
+          weight: 700
 
 flutter_native_splash:
-  # Required
-  color: "#ffffff" # Background color (hex)
-  image: assets/images/splash_logo.png # Your logo (centered)
+  color: "#0B1C2D" # Deep navy background
 
-  # Optional but recommended
+  image: assets/images/splash_logo.png # Logo shown in center
+  branding: assets/images/branding.png # Text logo at bottom
+
   android: true
   ios: true
   web: true
-  android_12: # Android 12+ specific (required for new devices)
-    color: "#ffffff"
+
+  android_12:
+    color: "#0B1C2D"
     image: assets/images/shuttle_splash_logo.png
     branding: assets/images/branding.png
 
-  # Optional: Customize further
-  branding: assets/images/branding.png # Small image at bottom
   android_gravity: center
   ios_content_mode: center
