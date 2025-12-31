@@ -1,4 +1,6 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/core/api/api_client.dart';
 import 'package:flutter_application_1/features/trips/enums/bottom_sheet_view.enum.dart';
 import 'package:flutter_application_1/features/trips/models/trip.dart';
 import 'package:flutter_application_1/features/trips/screens/search_trip/map_layer/map_controller_service.dart';
@@ -140,14 +142,51 @@ class SearchTripController extends ChangeNotifier {
     );
 
     selectedDateTime = combined;
-    dateTimeController.text = _formatDateTime(combined);
+    dateTimeController.text = formatDateTime(combined);
 
     notifyListeners();
   }
 
-  String _formatDateTime(DateTime dt) {
+  String formatDateTime(DateTime dt) {
     return "${dt.day}/${dt.month}/${dt.year} "
         "${dt.hour.toString().padLeft(2, '0')}:"
         "${dt.minute.toString().padLeft(2, '0')}";
+  }
+
+  void selectTrip(Trip trip) {
+    selectedTrip = trip;
+    currentView = BottomSheetView.details;
+    notifyListeners();
+  }
+
+  void clearSelectedTrip() {
+    selectedTrip = null;
+    notifyListeners();
+  }
+
+  void goToPreviousSheetView(BottomSheetView previousView) {
+    currentView = previousView;
+    notifyListeners();
+  }
+
+  Future<void> bookTrip({
+    required Trip trip,
+    required int seats,
+    required BuildContext context,
+  }) async {
+    try {
+      isLoading = true;
+      final booking = await tripService.bookTrip(seats: 1, tripId: trip.id);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Booking Successful: ${booking.id}')),
+      );
+    } on DioException catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(ApiClient.extractErrorMessage(e))));
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
   }
 }
