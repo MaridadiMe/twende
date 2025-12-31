@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/core/theme/app_colors.dart';
 import 'package:flutter_application_1/features/trips/enums/bottom_sheet_view.enum.dart';
 import 'package:flutter_application_1/features/trips/screens/search_trip/search_trip_controller.dart';
 
@@ -12,217 +13,175 @@ class TripDetailsSheet extends StatelessWidget {
     required this.scrollController,
   });
 
-  // @override
-  // Widget build(BuildContext context) {
-  //   if (controller.selectedTrip == null) return const SizedBox();
-  //   final trip = controller.selectedTrip!;
-
-  //   return ListView(
-  //     padding: const EdgeInsets.all(16),
-  //     controller: scrollController,
-  //     children: [
-  //       Center(
-  //         child: Container(
-  //           width: 40,
-  //           height: 4,
-  //           margin: const EdgeInsets.only(bottom: 16),
-  //           decoration: BoxDecoration(
-  //             color: Colors.grey[400],
-  //             borderRadius: BorderRadius.circular(2),
-  //           ),
-  //         ),
-  //       ),
-  //       TextButton.icon(
-  //         onPressed: () =>
-  //             controller.goToPreviousSheetView(BottomSheetView.results),
-  //         icon: const Icon(Icons.arrow_back),
-  //         label: const Text("Back to results"),
-  //       ),
-  //       const SizedBox(height: 12),
-
-  //       Card(
-  //         shape: RoundedRectangleBorder(
-  //           borderRadius: BorderRadius.circular(12),
-  //         ),
-  //         elevation: 2,
-  //         child: Padding(
-  //           padding: const EdgeInsets.all(16),
-  //           child: Column(
-  //             crossAxisAlignment: CrossAxisAlignment.start,
-  //             children: [
-  //               // Trip route and date
-  //               Text(
-  //                 "${trip.startAddress} → ${trip.endAddress}",
-  //                 style: const TextStyle(
-  //                   fontSize: 16,
-  //                   fontWeight: FontWeight.bold,
-  //                 ),
-  //               ),
-  //               const SizedBox(height: 8),
-  //               Text(
-  //                 "Departure: ${controller.formatDateTime(trip.departureAt)}",
-  //               ),
-
-  //               // Driver Details Section
-  //               const SizedBox(height: 16),
-  //               Row(
-  //                 children: [
-  //                   // Placeholder for Driver Profile Picture
-  //                   CircleAvatar(
-  //                     radius: 20,
-  //                     backgroundColor: Colors.grey[300],
-  //                     child: const Icon(Icons.person, color: Colors.white),
-  //                   ),
-  //                   const SizedBox(width: 12),
-  //                   // Driver Name and Rating
-  //                   Column(
-  //                     crossAxisAlignment: CrossAxisAlignment.start,
-  //                     children: [
-  //                       Text(
-  //                         "Driver: John Doe", // Placeholder name
-  //                         style: const TextStyle(fontWeight: FontWeight.bold),
-  //                       ),
-  //                       Row(
-  //                         children: [
-  //                           const Icon(
-  //                             Icons.star,
-  //                             color: Colors.amber,
-  //                             size: 16,
-  //                           ),
-  //                           const SizedBox(width: 4),
-  //                           Text("4.8"), // Placeholder rating
-  //                         ],
-  //                       ),
-  //                     ],
-  //                   ),
-  //                 ],
-  //               ),
-
-  //               const SizedBox(height: 16),
-
-  //               // Price and Available Seats
-  //               Row(
-  //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                 children: [
-  //                   Text(
-  //                     "Price: ${trip.price.toStringAsFixed(2)} TZS",
-  //                     style: const TextStyle(
-  //                       fontSize: 16,
-  //                       fontWeight: FontWeight.bold,
-  //                     ),
-  //                   ),
-  //                   Text(
-  //                     "Seats Available: ${trip.seatsAvailable} / ${trip.seatsTotal}",
-  //                     style: const TextStyle(fontSize: 14, color: Colors.grey),
-  //                   ),
-  //                 ],
-  //               ),
-  //               const SizedBox(height: 16),
-
-  //               // Book Trip Button
-  //               ElevatedButton(
-  //                 onPressed: () {
-  //                   // Proceed to booking
-  //                   controller.bookTrip(trip: trip, seats: 1, context: context);
-  //                 },
-  //                 child: controller.isLoading
-  //                     ? const CircularProgressIndicator()
-  //                     : const Text("Book Trip"),
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
-
   @override
   Widget build(BuildContext context) {
-    if (controller.selectedTrip == null) {
-      return const SizedBox();
-    }
+    if (controller.selectedTrip == null) return const SizedBox();
 
     final trip = controller.selectedTrip!;
+    final theme = Theme.of(context);
+
+    IconData vehicleIcon = Icons.directions_car;
+    switch (trip.vehicle?.type.toUpperCase()) {
+      case 'BUS':
+        vehicleIcon = Icons.directions_bus;
+        break;
+      case 'TRUCK':
+        Icons.directions_car;
+        break;
+    }
 
     return ListView(
       controller: scrollController,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsetsGeometry.directional(
+        bottom: 12,
+        start: 20,
+        end: 20,
+        top: 12,
+      ),
       children: [
         /// Drag handle
         Center(
           child: Container(
             width: 40,
-            height: 4,
-            margin: const EdgeInsets.only(bottom: 16),
+            height: 5,
+            margin: const EdgeInsets.only(bottom: 2),
             decoration: BoxDecoration(
-              color: Colors.grey[400],
-              borderRadius: BorderRadius.circular(2),
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(8),
             ),
           ),
         ),
 
         /// Back button
-        TextButton.icon(
-          onPressed: () =>
-              controller.goToPreviousSheetView(BottomSheetView.results),
-          icon: const Icon(Icons.arrow_back),
-          label: const Text("Back to results"),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: TextButton.icon(
+            onPressed: () =>
+                controller.goToPreviousSheetView(BottomSheetView.results),
+            icon: const Icon(Icons.arrow_back),
+            label: const Text(""),
+          ),
         ),
 
-        const SizedBox(height: 12),
+        const SizedBox(height: 8),
 
-        /// Trip details card
-        Card(
-          elevation: 2,
-          shape: RoundedRectangleBorder(
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.grey.shade50,
             borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey.shade200),
           ),
+          //
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(18),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                /// Route
-                Text(
-                  "${trip.startAddress} → ${trip.endAddress}",
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                Row(
+                  children: [
+                    Text(
+                      TimeOfDay.fromDateTime(trip.departureAt).format(context),
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(width: 8),
+                    const Icon(
+                      Icons.location_on,
+                      color: Colors.green,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        trip.startAddress,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
                 ),
 
-                const SizedBox(height: 8),
+                const SizedBox(height: 36),
 
-                /// Departure time
-                Text(
-                  "Departure: ${controller.formatDateTime(trip.departureAt)}",
-                  style: TextStyle(color: Colors.grey.shade700),
+                Row(
+                  children: [
+                    Text(
+                      TimeOfDay.fromDateTime(trip.departureAt).format(context),
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(width: 8),
+                    const Icon(Icons.location_on, color: Colors.red, size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        trip.endAddress,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
                 ),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: 24),
+                const Divider(color: Colors.grey),
+                const SizedBox(height: 24),
 
-                /// Driver section
+                /// Price
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text("Total price (1 passenger)"),
+                    Text(
+                      "TZS ${trip.price.toStringAsFixed(0)}",
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 24),
+                const Divider(color: Colors.grey),
+                const SizedBox(height: 24),
+
+                /// DRIVER SECTION
                 Row(
                   children: [
                     CircleAvatar(
-                      radius: 20,
+                      radius: 28,
                       backgroundColor: Colors.grey[300],
-                      child: const Icon(Icons.person, color: Colors.white),
+                      child: const Icon(
+                        Icons.person,
+                        size: 32,
+                        color: Colors.white,
+                      ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 16),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "Driver: John Doe",
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                        Text(
+                          trip.driver?.driverName ?? 'Unknown Driver',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
+                        const SizedBox(height: 4),
                         Row(
-                          children: const [
-                            Icon(Icons.star, color: Colors.amber, size: 16),
-                            SizedBox(width: 4),
-                            Text("4.8"),
+                          children: [
+                            const Icon(
+                              Icons.star,
+                              color: Colors.amber,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(trip.driver?.rating?.toString() ?? 'N/A'),
                           ],
                         ),
                       ],
@@ -230,64 +189,75 @@ class TripDetailsSheet extends StatelessWidget {
                   ],
                 ),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: 24),
+                const Divider(color: Colors.grey),
+                const SizedBox(height: 24),
 
-                /// Price & seats
+                /// VEHICLE SECTION
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      "${trip.price.toStringAsFixed(0)} TZS",
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF6200EE),
+                    Icon(vehicleIcon, size: 28, color: theme.primaryColor),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        trip.vehicle?.registrationNumber ?? '',
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
-                    Text(
-                      "Seats: ${trip.seatsAvailable} / ${trip.seatsTotal}",
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey.shade600,
-                      ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        const Text(
+                          "Seats",
+                          style: TextStyle(color: Colors.grey, fontSize: 13),
+                        ),
+                        Text(
+                          "${trip.seatsAvailable} / ${trip.seatsTotal}",
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
 
-                const SizedBox(height: 20),
-                const Divider(),
-                const SizedBox(height: 12),
+                const SizedBox(height: 24),
+                const Divider(color: Colors.grey),
+                const SizedBox(height: 24),
 
-                /// Book button (FULL WIDTH)
+                /// BOOK BUTTON
                 SizedBox(
                   width: double.infinity,
+                  height: 48,
                   child: ElevatedButton(
                     onPressed: controller.isLoading
                         ? null
-                        : () {
-                            controller.bookTrip(
-                              trip: trip,
-                              seats: 1,
-                              context: context,
-                            );
-                          },
+                        : () => controller.bookTrip(
+                            trip: trip,
+                            seats: 1,
+                            context: context,
+                          ),
                     style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      backgroundColor: const Color(
+                        0xFF00AEEF,
+                      ), // BlaBlaCar-style blue
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(26),
                       ),
                     ),
                     child: controller.isLoading
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
+                        ? const CircularProgressIndicator(color: Colors.white)
                         : const Text(
-                            "Book Trip",
+                            "Request to Book",
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 14,
                               fontWeight: FontWeight.bold,
+                              color: Colors.white,
                             ),
                           ),
                   ),
@@ -296,6 +266,8 @@ class TripDetailsSheet extends StatelessWidget {
             ),
           ),
         ),
+
+        /// Route + time
       ],
     );
   }
