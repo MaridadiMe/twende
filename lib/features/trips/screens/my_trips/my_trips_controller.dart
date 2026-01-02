@@ -38,4 +38,14 @@ class MyTripsController extends ChangeNotifier {
     selectedTrip = trip;
     notifyListeners();
   }
+
+  Future<void> refresh() async {
+    isLoading = true;
+    notifyListeners();
+
+    userTrips = await tripService.getUserTrips();
+
+    isLoading = false;
+    notifyListeners();
+  }
 }

@@ -1,3 +1,6 @@
+import 'package:flutter_application_1/features/auth/models/user.dart';
+import 'package:jwt_decode/jwt_decode.dart';
+
 import '../../../core/api/api_client.dart';
 import '../../../core/auth/auth_storage.dart';
 
@@ -22,5 +25,20 @@ class AuthService {
 
   Future<void> logout() async {
     await AuthStorage.clear();
+  }
+
+  /// 🔹 Get logged-in user from JWT
+  Future<User?> getCurrentUser() async {
+    final token = await AuthStorage.getToken();
+    if (token == null) return null;
+
+    // 🔐 Expiry check (built-in)
+    if (Jwt.isExpired(token)) {
+      await logout();
+      return null;
+    }
+
+    final payload = Jwt.parseJwt(token);
+    return User.fromJwt(payload);
   }
 }
