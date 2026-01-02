@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/features/booking/screens/bookings_screen.dart';
 import 'package:flutter_application_1/features/trips/screens/my_trips/my_trips_page.dart';
 import 'package:flutter_application_1/features/trips/screens/search_trip/search_trip_page.dart';
 import '../trips/screens/schedule_trip_screen.dart';
