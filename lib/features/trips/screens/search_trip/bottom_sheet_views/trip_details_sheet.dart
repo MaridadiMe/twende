@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/core/theme/app_colors.dart';
 import 'package:flutter_application_1/features/trips/enums/bottom_sheet_view.enum.dart';
 import 'package:flutter_application_1/features/trips/screens/search_trip/search_trip_controller.dart';
 
@@ -55,11 +54,10 @@ class TripDetailsSheet extends StatelessWidget {
         /// Back button
         Align(
           alignment: Alignment.centerLeft,
-          child: TextButton.icon(
+          child: IconButton(
+            icon: const Icon(Icons.arrow_back),
             onPressed: () =>
                 controller.goToPreviousSheetView(BottomSheetView.results),
-            icon: const Icon(Icons.arrow_back),
-            label: const Text(""),
           ),
         ),
 
@@ -104,7 +102,7 @@ class TripDetailsSheet extends StatelessWidget {
                   ],
                 ),
 
-                const SizedBox(height: 36),
+                const SizedBox(height: 20),
 
                 Row(
                   children: [
@@ -129,9 +127,9 @@ class TripDetailsSheet extends StatelessWidget {
                   ],
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: 12),
                 const Divider(color: Colors.grey),
-                const SizedBox(height: 24),
+                const SizedBox(height: 12),
 
                 /// Price
                 Row(
@@ -145,9 +143,9 @@ class TripDetailsSheet extends StatelessWidget {
                   ],
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: 12),
                 const Divider(color: Colors.grey),
-                const SizedBox(height: 24),
+                const SizedBox(height: 12),
 
                 /// DRIVER SECTION
                 Row(
@@ -189,9 +187,9 @@ class TripDetailsSheet extends StatelessWidget {
                   ],
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: 12),
                 const Divider(color: Colors.grey),
-                const SizedBox(height: 24),
+                const SizedBox(height: 12),
 
                 /// VEHICLE SECTION
                 Row(
@@ -226,9 +224,9 @@ class TripDetailsSheet extends StatelessWidget {
                   ],
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: 12),
                 const Divider(color: Colors.grey),
-                const SizedBox(height: 24),
+                const SizedBox(height: 12),
 
                 /// BOOK BUTTON
                 SizedBox(

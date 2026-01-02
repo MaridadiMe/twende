@@ -1,17 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/core/theme/app_colors.dart';
-import 'package:flutter_application_1/features/trips/enums/bottom_sheet_view.enum.dart';
-import 'package:flutter_application_1/features/trips/screens/search_trip/search_trip_controller.dart';
+import 'package:flutter_application_1/features/trips/screens/my_trips/my_trips_controller.dart';
 
-class TripResultsSheet extends StatelessWidget {
-  final SearchTripController controller;
-  final ScrollController scrollController;
-
-  const TripResultsSheet({
-    super.key,
-    required this.controller,
-    required this.scrollController,
-  });
+class TripsView extends StatelessWidget {
+  final MyTripsController controller;
+  const TripsView({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -41,44 +34,27 @@ class TripResultsSheet extends StatelessWidget {
       }
     }
 
-    return ListView(
-      controller: scrollController,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      children: [
-        /// drag handle
-        Center(
-          child: Container(
-            width: 40,
-            height: 4,
-            margin: const EdgeInsets.only(bottom: 16, top: 8),
-            decoration: BoxDecoration(
-              color: Colors.grey[400],
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-        ),
+    return AnimatedBuilder(
+      animation: controller,
+      builder: (context, _) {
+        // Loading state
+        if (controller.isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-        Align(
-          alignment: Alignment.centerLeft,
-          child: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () =>
-                controller.goToPreviousSheetView(BottomSheetView.searchForm),
-          ),
-        ),
+        // Empty state
+        if (controller.userTrips.isEmpty) {
+          return const Center(child: Text('Ready to view your trips?'));
+        }
 
-        if (controller.trips.isEmpty) Center(child: Text("No trips found")),
+        // Trips list
+        return ListView.separated(
+          itemCount: controller.userTrips.length,
+          separatorBuilder: (_, __) => const Divider(height: 1),
+          itemBuilder: (context, index) {
+            final trip = controller.userTrips[index];
 
-        ...controller.trips.map((trip) {
-          return Container(
-            margin: const EdgeInsets.only(bottom: 10),
-            decoration: BoxDecoration(
-              color: Colors.grey.shade50,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade200),
-            ),
-            //
-            child: ListTile(
+            return ListTile(
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 12,
                 vertical: 6,
@@ -105,7 +81,7 @@ class TripResultsSheet extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "${trip.vehicle!.registrationNumber} |Departs: ${controller.formatDateTime(trip.departureAt)}",
+                      "${trip.vehicle?.registrationNumber ?? 'N/A'} | Departs: ${controller.formatDateTime(trip.departureAt)}",
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey.shade600,
@@ -113,6 +89,15 @@ class TripResultsSheet extends StatelessWidget {
                     ),
 
                     const SizedBox(height: 4),
+
+                    Text(
+                      "Status: ${trip.bookings?.first.status}",
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.green.shade700,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -142,10 +127,10 @@ class TripResultsSheet extends StatelessWidget {
               ),
 
               onTap: () => controller.selectTrip(trip),
-            ),
-          );
-        }),
-      ],
+            );
+          },
+        );
+      },
     );
   }
 }

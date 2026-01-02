@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/features/booking/screens/bookings_screen.dart';
+import 'package:flutter_application_1/features/trips/screens/my_trips/my_trips_page.dart';
 import 'package:flutter_application_1/features/trips/screens/search_trip/search_trip_page.dart';
-import '../trips/screens/search_trip/search_trip_screen.dart';
 import '../trips/screens/schedule_trip_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -14,15 +14,9 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
 
-  // final List<Widget> _tabs = [
-  //   const SearchTripScreen(),
-  //   const BookingScreen(),
-  //   const ScheduleTripScreen(),
-  // ];
-
   final List<Widget> _tabs = [
     const SearchTripPage(),
-    const BookingScreen(),
+    const MyTripsPage(),
     const ScheduleTripScreen(),
   ];
 
@@ -30,7 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (_currentIndex == 0) return null;
     switch (_currentIndex) {
       case 1:
-        return AppBar(title: const Text('My Bookings'));
+        return AppBar(title: const Text('My Trips'));
       case 2:
         return AppBar(title: const Text('Profile'));
       default:

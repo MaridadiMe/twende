@@ -1,3 +1,4 @@
+import 'package:flutter_application_1/features/trips/models/trip_booking.dart';
 import 'package:flutter_application_1/features/trips/models/trip_driver.dart';
 import 'package:flutter_application_1/features/trips/models/trip_vehicle.dart';
 
@@ -19,6 +20,7 @@ class Trip {
 
   final TripDriver? driver;
   final TripVehicle? vehicle;
+  final List<TripBooking>? bookings;
 
   Trip({
     required this.id,
@@ -34,6 +36,7 @@ class Trip {
     required this.price,
     this.driver,
     this.vehicle,
+    this.bookings,
   });
 
   factory Trip.fromJson(Map<String, dynamic> json) {
@@ -52,6 +55,11 @@ class Trip {
       seatsTotal: json['seatsTotal'],
       seatsAvailable: json['seatsAvailable'],
       price: (json['price'] as num).toDouble(),
+      bookings: json['bookings'] != null
+          ? (json['bookings'] as List)
+                .map((bookingJson) => TripBooking.fromJson(bookingJson))
+                .toList()
+          : null,
 
       driver: json['driver'] != null
           ? TripDriver.fromJson(json['driver'])

@@ -43,4 +43,16 @@ class TripService {
     final data = response.data['data'];
     return Booking.fromJson(data);
   }
+
+  Future<List<Trip>> getUserTrips() async {
+    final response = await _apiClient.dio.get('/api/v1/fms/trips/mine');
+
+    final data = response.data['data'];
+
+    if (data == null || data is! List) {
+      return [];
+    }
+
+    return data.map<Trip>((trip) => Trip.fromJson(trip)).toList();
+  }
 }
