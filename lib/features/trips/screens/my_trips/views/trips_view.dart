@@ -144,105 +144,108 @@ class TripsView extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
 
-        return ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-          children: [
-            // Empty state
-            if (controller.userTrips.isEmpty)
-              const Center(
-                child: Padding(
-                  padding: EdgeInsets.only(top: 24),
-                  child: Text('Your Booked Trips Will Be Shown Here!'),
-                ),
-              ),
-
-            // Trips
-            ...controller.userTrips.map((trip) {
-              return Container(
-                margin: const EdgeInsets.only(bottom: 10),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade50,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade200),
-                ),
-                child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
+        return RefreshIndicator(
+          onRefresh: controller.getUserTrips,
+          child: ListView(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            children: [
+              // Empty state
+              if (controller.userTrips.isEmpty)
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 24),
+                    child: Text('Your Booked Trips Will Be Shown Here!'),
                   ),
+                ),
 
-                  leading: Icon(
-                    vehicleTypeIcon(trip.vehicle?.type),
-                    color: vehicleIconColor(trip.vehicle?.type),
-                    size: 22,
+              // Trips
+              ...controller.userTrips.map((trip) {
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade200),
                   ),
-
-                  title: Text(
-                    "${trip.startAddress} → ${trip.endAddress}",
-                    style: TextStyle(
-                      color: Theme.of(context).textTheme.bodyMedium?.color,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
                     ),
-                  ),
 
-                  subtitle: Padding(
-                    padding: const EdgeInsets.only(top: 6),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "${trip.vehicle?.registrationNumber ?? 'N/A'} | Trip Date: ${controller.formatDateTime(trip.departureAt)}",
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
+                    leading: Icon(
+                      vehicleTypeIcon(trip.vehicle?.type),
+                      color: vehicleIconColor(trip.vehicle?.type),
+                      size: 22,
+                    ),
 
-                        const SizedBox(height: 4),
+                    title: Text(
+                      "${trip.startAddress} → ${trip.endAddress}",
+                      style: TextStyle(
+                        color: Theme.of(context).textTheme.bodyMedium?.color,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
 
-                        if (trip.bookings != null)
+                    subtitle: Padding(
+                      padding: const EdgeInsets.only(top: 6),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                           Text(
-                            "Trip Status: ${trip.status}",
+                            "${trip.vehicle?.registrationNumber ?? 'N/A'} | Trip Date: ${controller.formatDateTime(trip.departureAt)}",
                             style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.green.shade700,
+                              fontSize: 12,
+                              color: Colors.grey.shade600,
                             ),
                           ),
+
+                          const SizedBox(height: 4),
+
+                          if (trip.bookings != null)
+                            Text(
+                              "Trip Status: ${trip.status}",
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.green.shade700,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+
+                    trailing: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          "${trip.price} TZS",
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          "${trip.bookings?.first.seats} seat${trip.bookings?.first.seats == 1 ? '' : 's'}",
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: trip.bookings?.first.seats == 10
+                                ? Colors.redAccent
+                                : Colors.green.shade700,
+                          ),
+                        ),
                       ],
                     ),
-                  ),
 
-                  trailing: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        "${trip.price} TZS",
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        "${trip.bookings?.first.seats} seat${trip.bookings?.first.seats == 1 ? '' : 's'}",
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: trip.bookings?.first.seats == 10
-                              ? Colors.redAccent
-                              : Colors.green.shade700,
-                        ),
-                      ),
-                    ],
+                    onTap: () => controller.selectTrip(trip),
                   ),
-
-                  onTap: () => controller.selectTrip(trip),
-                ),
-              );
-            }),
-          ],
+                );
+              }),
+            ],
+          ),
         );
       },
     );
