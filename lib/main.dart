@@ -5,7 +5,7 @@ import 'package:flutter_application_1/features/auth/auth_gate.dart';
 import 'package:flutter_application_1/features/auth/screens/login_screen.dart';
 import 'package:flutter_application_1/features/auth/screens/register_screen.dart';
 import 'package:flutter_application_1/features/home/home_screen.dart';
-import 'package:flutter_application_1/features/trips/screens/search_trip/search_trip_screen.dart';
+import 'package:flutter_application_1/features/trips/screens/search_trip/search_trip_page.dart';
 
 void main() async {
   //await dotenv.load(fileName: ".env");
@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
         '/login': (_) => const LoginScreen(),
         '/register': (_) => const RegisterScreen(),
         '/home': (_) => const HomeScreen(),
-        '/search-trips': (_) => const SearchTripScreen(),
+        '/search-trips': (_) => const SearchTripPage(),
         // '/schedule-trip': (_) => const ScheduleTripScreen(),
       },
     );
