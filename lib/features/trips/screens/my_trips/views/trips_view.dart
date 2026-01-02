@@ -203,7 +203,7 @@ class TripsView extends StatelessWidget {
 
                         if (trip.bookings != null)
                           Text(
-                            "Trip Status: ${trip.bookings?.first.status}",
+                            "Trip Status: ${trip.status}",
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w500,

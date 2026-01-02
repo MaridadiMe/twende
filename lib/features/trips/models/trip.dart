@@ -17,6 +17,7 @@ class Trip {
   final int seatsTotal;
   final int seatsAvailable;
   final double price;
+  final String status;
 
   final TripDriver? driver;
   final TripVehicle? vehicle;
@@ -34,6 +35,7 @@ class Trip {
     required this.seatsTotal,
     required this.seatsAvailable,
     required this.price,
+    required this.status,
     this.driver,
     this.vehicle,
     this.bookings,
@@ -55,6 +57,7 @@ class Trip {
       seatsTotal: json['seatsTotal'],
       seatsAvailable: json['seatsAvailable'],
       price: (json['price'] as num).toDouble(),
+      status: json['status'],
       bookings: json['bookings'] != null
           ? (json['bookings'] as List)
                 .map((bookingJson) => TripBooking.fromJson(bookingJson))
