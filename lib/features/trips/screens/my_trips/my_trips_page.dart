@@ -21,7 +21,7 @@ class _MyTripsPageState extends State<MyTripsPage> {
     tripService = TripService(apiClient);
     controller = MyTripsController(apiClient, tripService);
 
-    controller.getUserTrips(); // 🔥 called once on page load
+    controller.getUserTrips();
   }
 
   @override

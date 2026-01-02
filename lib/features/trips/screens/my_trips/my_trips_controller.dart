@@ -15,8 +15,17 @@ class MyTripsController extends ChangeNotifier {
 
   Future<void> getUserTrips() async {
     isLoading = true;
-    userTrips = await tripService.getUserTrips();
-    isLoading = false;
+    notifyListeners(); // 🔥 tell UI to show loader
+
+    try {
+      userTrips = await tripService.getUserTrips();
+    } catch (e) {
+      userTrips = [];
+      // optionally store error message
+    } finally {
+      isLoading = false;
+      notifyListeners(); // 🔥 tell UI to rebuild
+    }
   }
 
   String formatDateTime(DateTime dt) {
