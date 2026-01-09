@@ -30,4 +30,17 @@ class User {
       permissions: List<String>.from(payload['permissions'] ?? []),
     );
   }
+
+  /// 🔹 Used for API responses (register, get profile, etc.)
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      id: json['id'],
+      email: json['email'],
+      phone: json['phone'],
+      firstName: json['firstName'],
+      lastName: json['lastName'],
+      userName: json['userName'],
+      permissions: const [], // ❗ Not provided during registration
+    );
+  }
 }

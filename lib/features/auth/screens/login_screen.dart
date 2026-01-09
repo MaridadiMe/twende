@@ -113,8 +113,22 @@ class _LoginScreenState extends State<LoginScreen> {
 
               // Register Link
               TextButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/register');
+                onPressed: () async {
+                  final result = await Navigator.pushNamed(
+                    context,
+                    '/register',
+                  );
+
+                  if (!mounted) return;
+
+                  if (result == true) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Registration successful. Please login'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  }
                 },
                 child: const Text('Don\'t have an account? Register'),
               ),

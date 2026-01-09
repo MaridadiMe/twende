@@ -1,4 +1,7 @@
+import 'package:flutter_application_1/features/auth/models/register_user_dto.dart';
+import 'package:flutter_application_1/features/auth/models/request_otp_dto.dart';
 import 'package:flutter_application_1/features/auth/models/user.dart';
+import 'package:flutter_application_1/features/auth/models/verify_otp_dto.dart';
 import 'package:jwt_decode/jwt_decode.dart';
 
 import '../../../core/api/api_client.dart';
@@ -23,8 +26,33 @@ class AuthService {
     await AuthStorage.saveToken(token);
   }
 
+  Future<User> register(RegisterUserDto payload) async {
+    final response = await _apiClient.dio.post(
+      '/api/v1/iam/users',
+      data: payload.toJson(),
+    );
+
+    final data = response.data['data'];
+
+    return User.fromJson(data);
+  }
+
   Future<void> logout() async {
     await AuthStorage.clear();
+  }
+
+  Future<void> verifyOtp(VerifyOtpDto payload) async {
+    await _apiClient.dio.post(
+      '/api/v1/iam/users/confirm-phone',
+      data: payload.toJson(),
+    );
+  }
+
+  Future<void> requestOtp(RequestOtpDto payload) async {
+    await _apiClient.dio.post(
+      '/api/v1/iam/users/verify-phone',
+      data: payload.toJson(),
+    );
   }
 
   /// 🔹 Get logged-in user from JWT
