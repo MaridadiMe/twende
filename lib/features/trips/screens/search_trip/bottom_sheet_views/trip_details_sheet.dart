@@ -5,11 +5,13 @@ import 'package:flutter_application_1/features/trips/screens/search_trip/search_
 class TripDetailsSheet extends StatelessWidget {
   final SearchTripController controller;
   final ScrollController scrollController;
+  final VoidCallback onBookingSuccess;
 
   const TripDetailsSheet({
     super.key,
     required this.controller,
     required this.scrollController,
+    required this.onBookingSuccess,
   });
 
   @override
@@ -235,11 +237,23 @@ class TripDetailsSheet extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: controller.isLoading
                         ? null
-                        : () => controller.bookTrip(
-                            trip: trip,
-                            seats: 1,
-                            context: context,
-                          ),
+                        : () async {
+                            final success = await controller.bookTrip(
+                              trip: trip,
+                              seats: 1,
+                            );
+
+                            if (success) {
+                              onBookingSuccess();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Booking Successful: ')),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Booking failed')),
+                              );
+                            }
+                          },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(
                         0xFF00AEEF,

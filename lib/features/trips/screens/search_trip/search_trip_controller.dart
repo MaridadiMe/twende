@@ -169,21 +169,14 @@ class SearchTripController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> bookTrip({
-    required Trip trip,
-    required int seats,
-    required BuildContext context,
-  }) async {
+  Future<bool> bookTrip({required Trip trip, required int seats}) async {
     try {
       isLoading = true;
-      final booking = await tripService.bookTrip(seats: 1, tripId: trip.id);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Booking Successful: ${booking.id}')),
-      );
+      await tripService.bookTrip(seats: 1, tripId: trip.id);
+
+      return true;
     } on DioException catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(ApiClient.extractErrorMessage(e))));
+      return false;
     } finally {
       isLoading = false;
       notifyListeners();

@@ -10,7 +10,8 @@ import 'package:flutter_application_1/features/trips/screens/search_trip/search_
 import 'package:flutter_application_1/features/trips/services/trip_service.dart';
 
 class SearchTripPage extends StatefulWidget {
-  const SearchTripPage({super.key});
+  final VoidCallback onBookingSuccess;
+  const SearchTripPage({super.key, required this.onBookingSuccess});
 
   @override
   State<SearchTripPage> createState() => _SearchTripPageState();
@@ -63,6 +64,7 @@ class _SearchTripPageState extends State<SearchTripPage> {
                     buildDetails: (sc) => TripDetailsSheet(
                       controller: controller,
                       scrollController: sc,
+                      onBookingSuccess: widget.onBookingSuccess,
                     ),
                   ),
                 );

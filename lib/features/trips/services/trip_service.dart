@@ -44,6 +44,25 @@ class TripService {
     return Booking.fromJson(data);
   }
 
+  // MOCK cancelTrip
+  Future<bool> cancelTrip({required String tripId}) async {
+    // simulate network delay
+    await Future.delayed(const Duration(milliseconds: 500));
+    // just return true to simulate success
+    return true;
+  }
+
+  // MOCK payForTrip
+  Future<bool> payForTrip({
+    required String tripId,
+    required String phoneNumber,
+  }) async {
+    // simulate network delay
+    await Future.delayed(const Duration(milliseconds: 500));
+    // just return true to simulate success
+    return true;
+  }
+
   Future<List<Trip>> getUserTrips() async {
     final response = await _apiClient.dio.get('/api/v1/fms/trips/mine');
 

@@ -27,6 +27,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   late final List<Widget> _tabs;
 
+  void switchToMyTrips() {
+    _onTabSelected(1);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -39,8 +43,8 @@ class _HomeScreenState extends State<HomeScreen> {
     profileController = ProfileController(authService);
 
     _tabs = [
-      const SearchTripPage(),
-      const MyTripsPage(),
+      SearchTripPage(onBookingSuccess: switchToMyTrips),
+      MyTripsPage(controller: myTripsController),
       ProfileScreen(controller: profileController),
     ];
   }

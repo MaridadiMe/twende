@@ -48,4 +48,41 @@ class MyTripsController extends ChangeNotifier {
     isLoading = false;
     notifyListeners();
   }
+
+  Future<bool> cancelTrip({required Trip trip}) async {
+    isLoading = true;
+    notifyListeners();
+
+    try {
+      await tripService.cancelTrip(tripId: trip.id);
+      userTrips.removeWhere((t) => t.id == trip.id);
+      return true;
+    } catch (e) {
+      // Handle error if needed
+      return false;
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> payForTrip({
+    required Trip trip,
+    required String phoneNumber,
+  }) async {
+    isLoading = true;
+    notifyListeners();
+
+    try {
+      await tripService.payForTrip(tripId: trip.id, phoneNumber: phoneNumber);
+      // Update trip status if needed
+      return true;
+    } catch (e) {
+      // Handle error if needed
+      return false;
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
 }

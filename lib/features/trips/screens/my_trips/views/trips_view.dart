@@ -6,109 +6,6 @@ class TripsView extends StatelessWidget {
   final MyTripsController controller;
   const TripsView({super.key, required this.controller});
 
-  // @override
-  // Widget build(BuildContext context) {
-
-  //   return AnimatedBuilder(
-  //     animation: controller,
-  //     builder: (context, _) {
-  //       // Loading state
-  //       if (controller.isLoading) {
-  //         return const Center(child: CircularProgressIndicator());
-  //       }
-
-  //       // Empty state
-  //       if (controller.userTrips.isEmpty) {
-  //         return const Center(child: Text('Ready to view your trips?'));
-  //       }
-
-  //       // Trips list
-  //       return ListView.separated(
-  //         itemCount: controller.userTrips.length,
-  //         separatorBuilder: (_, __) => const Divider(height: 1),
-  //         itemBuilder: (context, index) {
-  //           final trip = controller.userTrips[index];
-
-  //           return ListTile(
-  //             contentPadding: const EdgeInsets.symmetric(
-  //               horizontal: 12,
-  //               vertical: 6,
-  //             ),
-
-  //             leading: Icon(
-  //               vehicleTypeIcon(trip.vehicle?.type),
-  //               color: vehicleIconColor(trip.vehicle?.type),
-  //               size: 22,
-  //             ),
-
-  //             title: Text(
-  //               "${trip.startAddress} → ${trip.endAddress}",
-  //               style: TextStyle(
-  //                 color: Theme.of(context).textTheme.bodyMedium?.color,
-  //                 fontSize: 12,
-  //                 fontWeight: FontWeight.w600,
-  //               ),
-  //             ),
-
-  //             subtitle: Padding(
-  //               padding: const EdgeInsets.only(top: 6),
-  //               child: Column(
-  //                 crossAxisAlignment: CrossAxisAlignment.start,
-  //                 children: [
-  //                   Text(
-  //                     "${trip.vehicle?.registrationNumber ?? 'N/A'} | Departs: ${controller.formatDateTime(trip.departureAt)}",
-  //                     style: TextStyle(
-  //                       fontSize: 12,
-  //                       color: Colors.grey.shade600,
-  //                     ),
-  //                   ),
-
-  //                   const SizedBox(height: 4),
-
-  //                   Text(
-  //                     "Status: ${trip.bookings?.first.status}",
-  //                     style: TextStyle(
-  //                       fontSize: 11,
-  //                       fontWeight: FontWeight.w500,
-  //                       color: Colors.green.shade700,
-  //                     ),
-  //                   ),
-  //                 ],
-  //               ),
-  //             ),
-
-  //             trailing: Column(
-  //               mainAxisAlignment: MainAxisAlignment.center,
-  //               crossAxisAlignment: CrossAxisAlignment.end,
-  //               children: [
-  //                 Text(
-  //                   "${trip.price} TZS",
-  //                   style: const TextStyle(
-  //                     fontSize: 13,
-  //                     fontWeight: FontWeight.bold,
-  //                   ),
-  //                 ),
-  //                 const SizedBox(height: 4),
-  //                 Text(
-  //                   "${trip.bookings?.first.seats} seat${trip.bookings?.first.seats == 1 ? '' : 's'}",
-  //                   style: TextStyle(
-  //                     fontSize: 11,
-  //                     color: trip.seatsAvailable == 1
-  //                         ? Colors.redAccent
-  //                         : Colors.grey.shade600,
-  //                   ),
-  //                 ),
-  //               ],
-  //             ),
-
-  //             onTap: () => controller.selectTrip(trip),
-  //           );
-  //         },
-  //       );
-  //     },
-  //   );
-  // }
-
   @override
   Widget build(BuildContext context) {
     IconData vehicleTypeIcon(String? type) {
@@ -203,14 +100,123 @@ class TripsView extends StatelessWidget {
 
                           const SizedBox(height: 4),
 
-                          if (trip.bookings != null)
+                          Text(
+                            "Trip Status: ${trip.status}",
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.green.shade700,
+                            ),
+                          ),
+
+                          const SizedBox(height: 4),
+
+                          if (trip.bookings?.first != null)
                             Text(
-                              "Trip Status: ${trip.status}",
+                              "Booking Status: ${trip.bookings?.first.status}",
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w500,
                                 color: Colors.green.shade700,
                               ),
+                            ),
+
+                          if (trip.bookings?.first.status ==
+                              'BOOKED') // or 'BOOKED' if you rename
+                            Column(
+                              children: [
+                                const SizedBox(height: 8),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    // Cancel button - secondary
+                                    SizedBox(
+                                      width: 100,
+                                      height: 32,
+                                      child: OutlinedButton(
+                                        onPressed: () async {
+                                          final success = await controller
+                                              .cancelTrip(trip: trip);
+                                          if (success) {
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              const SnackBar(
+                                                content: Text('Trip cancelled'),
+                                              ),
+                                            );
+                                          }
+                                        },
+                                        style: OutlinedButton.styleFrom(
+                                          side: BorderSide(
+                                            color: Colors.redAccent,
+                                          ), // border color
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
+                                          ),
+                                          padding: EdgeInsets.zero,
+                                        ),
+                                        child: Text(
+                                          'Cancel',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors
+                                                .redAccent, // text matches border
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+
+                                    const SizedBox(width: 8),
+
+                                    // Pay button - primary action
+                                    SizedBox(
+                                      width: 100,
+                                      height: 32,
+                                      child: ElevatedButton(
+                                        onPressed: () async {
+                                          final success = await controller
+                                              .payForTrip(
+                                                trip: trip,
+                                                phoneNumber: '123',
+                                              );
+                                          if (success) {
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                  'Payment successful',
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: AppColors.primary,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
+                                          ),
+                                          padding: EdgeInsets.zero,
+                                        ),
+                                        child: const Text(
+                                          'Pay',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                         ],
                       ),
