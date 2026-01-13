@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/core/api/api_client.dart';
 import 'package:flutter_application_1/features/trips/enums/bottom_sheet_view.enum.dart';
 import 'package:flutter_application_1/features/trips/models/trip.dart';
 import 'package:flutter_application_1/features/trips/screens/search_trip/map_layer/map_controller_service.dart';
