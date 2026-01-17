@@ -54,7 +54,8 @@ class MyTripsController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await tripService.cancelTrip(tripId: trip.id);
+      final booking = trip.bookings?.first.id ?? '';
+      await tripService.cancelTrip(tripId: trip.id, bookingId: booking);
       userTrips.removeWhere((t) => t.id == trip.id);
       return true;
     } catch (e) {

@@ -36,7 +36,7 @@ class TripService {
 
   Future<Booking> bookTrip({required int seats, required String tripId}) async {
     final response = await _apiClient.dio.post(
-      '/api/v1/fms/bookings',
+      '/api/v1/fms/trips/$tripId/bookings',
       data: {'tripId': tripId, 'seats': seats},
     );
 
@@ -45,10 +45,13 @@ class TripService {
   }
 
   // MOCK cancelTrip
-  Future<bool> cancelTrip({required String tripId}) async {
-    // simulate network delay
-    await Future.delayed(const Duration(milliseconds: 500));
-    // just return true to simulate success
+  Future<bool> cancelTrip({
+    required String tripId,
+    required String bookingId,
+  }) async {
+    await _apiClient.dio.delete(
+      '/api/v1/fms/trips/$tripId/bookings/$bookingId',
+    );
     return true;
   }
 

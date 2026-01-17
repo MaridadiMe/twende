@@ -101,7 +101,7 @@ class TripsView extends StatelessWidget {
                           const SizedBox(height: 4),
 
                           Text(
-                            "Trip Status: ${trip.status}",
+                            "Trip: ${trip.status} | Booking: ${trip.bookings?.first.status}",
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w500,
@@ -111,28 +111,19 @@ class TripsView extends StatelessWidget {
 
                           const SizedBox(height: 4),
 
-                          if (trip.bookings?.first != null)
-                            Text(
-                              "Booking Status: ${trip.bookings?.first.status}",
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.green.shade700,
-                              ),
-                            ),
-
                           if (trip.bookings?.first.status ==
-                              'BOOKED') // or 'BOOKED' if you rename
+                              'RESERVED') // or 'BOOKED' if you rename
                             Column(
                               children: [
                                 const SizedBox(height: 8),
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     // Cancel button - secondary
                                     SizedBox(
                                       width: 100,
-                                      height: 32,
+                                      height: 25,
                                       child: OutlinedButton(
                                         onPressed: () async {
                                           final success = await controller
@@ -153,7 +144,7 @@ class TripsView extends StatelessWidget {
                                           ), // border color
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(
-                                              8,
+                                              4,
                                             ),
                                           ),
                                           padding: EdgeInsets.zero,
@@ -175,7 +166,7 @@ class TripsView extends StatelessWidget {
                                     // Pay button - primary action
                                     SizedBox(
                                       width: 100,
-                                      height: 32,
+                                      height: 25,
                                       child: ElevatedButton(
                                         onPressed: () async {
                                           final success = await controller
@@ -199,13 +190,13 @@ class TripsView extends StatelessWidget {
                                           backgroundColor: AppColors.primary,
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(
-                                              8,
+                                              4,
                                             ),
                                           ),
                                           padding: EdgeInsets.zero,
                                         ),
                                         child: const Text(
-                                          'Pay',
+                                          'Confirm',
                                           style: TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.w600,
@@ -227,9 +218,17 @@ class TripsView extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          "${trip.price} TZS",
+                          "TZS",
                           style: const TextStyle(
-                            fontSize: 13,
+                            fontSize: 8,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 1),
+                        Text(
+                          "${trip.price}",
+                          style: const TextStyle(
+                            fontSize: 12,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
