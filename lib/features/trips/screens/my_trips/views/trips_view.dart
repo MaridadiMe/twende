@@ -91,7 +91,7 @@ class TripsView extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "${trip.vehicle?.registrationNumber ?? 'N/A'} | Trip Date: ${controller.formatDateTime(trip.departureAt)}",
+                            "${trip.vehicle?.registrationNumber ?? 'N/A'} | Trip Date: ${controller.formatUtcTimeToLocal(trip.departureAt)}",
                             style: TextStyle(
                               fontSize: 12,
                               color: Colors.grey.shade600,
@@ -164,47 +164,47 @@ class TripsView extends StatelessWidget {
                                     const SizedBox(width: 8),
 
                                     // Pay button - primary action
-                                    SizedBox(
-                                      width: 100,
-                                      height: 25,
-                                      child: ElevatedButton(
-                                        onPressed: () async {
-                                          final success = await controller
-                                              .payForTrip(
-                                                trip: trip,
-                                                phoneNumber: '123',
-                                              );
-                                          if (success) {
-                                            ScaffoldMessenger.of(
-                                              context,
-                                            ).showSnackBar(
-                                              const SnackBar(
-                                                content: Text(
-                                                  'Payment successful',
-                                                ),
-                                              ),
-                                            );
-                                          }
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: AppColors.primary,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              4,
-                                            ),
-                                          ),
-                                          padding: EdgeInsets.zero,
-                                        ),
-                                        child: const Text(
-                                          'Confirm',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
+                                    // SizedBox(
+                                    //   width: 100,
+                                    //   height: 25,
+                                    //   child: ElevatedButton(
+                                    //     onPressed: () async {
+                                    //       final success = await controller
+                                    //           .payForTrip(
+                                    //             trip: trip,
+                                    //             phoneNumber: '123',
+                                    //           );
+                                    //       if (success) {
+                                    //         ScaffoldMessenger.of(
+                                    //           context,
+                                    //         ).showSnackBar(
+                                    //           const SnackBar(
+                                    //             content: Text(
+                                    //               'Payment successful',
+                                    //             ),
+                                    //           ),
+                                    //         );
+                                    //       }
+                                    //     },
+                                    //     style: ElevatedButton.styleFrom(
+                                    //       backgroundColor: AppColors.primary,
+                                    //       shape: RoundedRectangleBorder(
+                                    //         borderRadius: BorderRadius.circular(
+                                    //           4,
+                                    //         ),
+                                    //       ),
+                                    //       padding: EdgeInsets.zero,
+                                    //     ),
+                                    //     child: const Text(
+                                    //       'Confirm',
+                                    //       style: TextStyle(
+                                    //         fontSize: 12,
+                                    //         fontWeight: FontWeight.w600,
+                                    //         color: Colors.white,
+                                    //       ),
+                                    //     ),
+                                    //   ),
+                                    // ),
                                   ],
                                 ),
                               ],

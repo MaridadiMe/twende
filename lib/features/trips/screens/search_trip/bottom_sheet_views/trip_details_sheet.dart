@@ -80,7 +80,9 @@ class TripDetailsSheet extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      TimeOfDay.fromDateTime(trip.departureAt).format(context),
+                      TimeOfDay.fromDateTime(
+                        trip.departureAt.toLocal(),
+                      ).format(context),
                       style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(width: 8),
@@ -109,7 +111,9 @@ class TripDetailsSheet extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      TimeOfDay.fromDateTime(trip.departureAt).format(context),
+                      TimeOfDay.fromDateTime(
+                        trip.departureAt.toLocal(),
+                      ).format(context),
                       style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(width: 8),

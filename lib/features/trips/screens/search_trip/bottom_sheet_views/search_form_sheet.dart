@@ -37,7 +37,7 @@ class SearchFormSheet extends StatelessWidget {
           googleAPIKey: controller.mapService.apiKey,
           inputDecoration: InputDecoration(
             hintText: "Pickup location",
-            prefixIcon: const Icon(Icons.my_location),
+            prefixIcon: const Icon(Icons.location_on),
             filled: true,
             fillColor: Colors.grey[100],
             border: OutlineInputBorder(
@@ -69,7 +69,7 @@ class SearchFormSheet extends StatelessWidget {
           googleAPIKey: controller.mapService.apiKey,
           inputDecoration: InputDecoration(
             hintText: "Where to?",
-            prefixIcon: const Icon(Icons.location_on),
+            prefixIcon: const Icon(Icons.my_location),
             filled: true,
             fillColor: Colors.grey[100],
             border: OutlineInputBorder(

@@ -82,8 +82,8 @@ class _TripMapViewState extends State<TripMapView> {
         }
       },
       myLocationEnabled: true,
-      myLocationButtonEnabled: false,
-      zoomControlsEnabled: false,
+      myLocationButtonEnabled: true,
+      zoomControlsEnabled: true,
       compassEnabled: true,
       mapToolbarEnabled: false,
     );

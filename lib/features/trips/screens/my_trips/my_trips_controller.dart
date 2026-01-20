@@ -34,6 +34,14 @@ class MyTripsController extends ChangeNotifier {
         "${dt.minute.toString().padLeft(2, '0')}";
   }
 
+  String formatUtcTimeToLocal(DateTime utcDateTime) {
+    final local = utcDateTime.toLocal();
+
+    return "${local.day}/${local.month}/${local.year} "
+        "${local.hour.toString().padLeft(2, '0')}:"
+        "${local.minute.toString().padLeft(2, '0')}";
+  }
+
   void selectTrip(Trip trip) {
     selectedTrip = trip;
     notifyListeners();

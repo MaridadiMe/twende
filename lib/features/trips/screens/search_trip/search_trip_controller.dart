@@ -27,9 +27,10 @@ class SearchTripController extends ChangeNotifier {
   List<Trip> trips = [];
   Trip? selectedTrip;
 
-  DateTime get departureFrom => selectedDateTime!;
+  DateTime get departureFrom => selectedDateTime!.toUtc();
+
   DateTime get departureTo =>
-      selectedDateTime!.add(const Duration(minutes: 30));
+      selectedDateTime!.add(const Duration(minutes: 30)).toUtc();
 
   Future<void> searchTrips() async {
     if (!isFormValid) throw Exception('Invalid form');
@@ -82,7 +83,7 @@ class SearchTripController extends ChangeNotifier {
       );
     }
 
-    mapService.moveCamera(lat, lon);
+    // mapService.moveCamera(lat, lon);
 
     notifyListeners();
   }
@@ -106,7 +107,13 @@ class SearchTripController extends ChangeNotifier {
       mapService.drawRoute(pickupLat!, pickupLon!, dropLat!, dropLon!);
     }
 
-    mapService.moveCamera(lat, lon);
+    // mapService.moveCamera(lat, lon);
+    mapService.drawRoute(
+      pickupLat!,
+      pickupLon!,
+      dropLat ?? lat,
+      dropLon ?? lon,
+    );
 
     notifyListeners();
   }
@@ -141,6 +148,7 @@ class SearchTripController extends ChangeNotifier {
     );
 
     selectedDateTime = combined;
+
     dateTimeController.text = formatDateTime(combined);
 
     notifyListeners();
@@ -150,6 +158,14 @@ class SearchTripController extends ChangeNotifier {
     return "${dt.day}/${dt.month}/${dt.year} "
         "${dt.hour.toString().padLeft(2, '0')}:"
         "${dt.minute.toString().padLeft(2, '0')}";
+  }
+
+  String formatUtcTimeToLocal(DateTime utcDateTime) {
+    final local = utcDateTime.toLocal();
+
+    return "${local.day}/${local.month}/${local.year} "
+        "${local.hour.toString().padLeft(2, '0')}:"
+        "${local.minute.toString().padLeft(2, '0')}";
   }
 
   void selectTrip(Trip trip) {

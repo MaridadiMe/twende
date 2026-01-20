@@ -105,7 +105,7 @@ class TripResultsSheet extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "${trip.vehicle!.registrationNumber} |Departs: ${controller.formatDateTime(trip.departureAt)}",
+                      "${trip.vehicle!.registrationNumber} |Departs: ${controller.formatUtcTimeToLocal(trip.departureAt)}",
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey.shade600,

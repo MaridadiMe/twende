@@ -33,7 +33,7 @@ class _SearchTripPageState extends State<SearchTripPage> {
       children: [
         TripMapView(mapService), // Your map widget
         DraggableScrollableSheet(
-          initialChildSize: 0.25,
+          initialChildSize: 0.40,
           minChildSize: 0.15,
           maxChildSize: 0.75,
           builder: (_, scrollController) {
