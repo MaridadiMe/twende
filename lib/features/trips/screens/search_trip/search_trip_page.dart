@@ -19,13 +19,34 @@ class SearchTripPage extends StatefulWidget {
 
 class _SearchTripPageState extends State<SearchTripPage> {
   static String googleApiKey = 'AIzaSyAkR1UUa5oJDKs92cX-BZsLkTAh86g9d6g';
-  static MapControllerService mapService = MapControllerService(googleApiKey);
-  static ApiClient apiClient = ApiClient();
-  static TripService tripService = TripService(apiClient);
-  SearchTripController controller = SearchTripController(
-    tripService,
-    mapService,
-  );
+
+  late MapControllerService mapService;
+  late ApiClient apiClient;
+  late TripService tripService;
+  late SearchTripController controller;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // ✅ Create a fresh map service
+    mapService = MapControllerService(googleApiKey);
+
+    // ✅ Create a single ApiClient
+    apiClient = ApiClient();
+
+    // ✅ Use the same ApiClient for TripService
+    tripService = TripService(apiClient);
+
+    // ✅ Pass the same tripService and mapService to controller
+    controller = SearchTripController(tripService, mapService);
+  }
+
+  @override
+  void dispose() {
+    mapService.dispose(); // clean up when leaving page
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +54,7 @@ class _SearchTripPageState extends State<SearchTripPage> {
       children: [
         TripMapView(mapService), // Your map widget
         DraggableScrollableSheet(
-          initialChildSize: 0.40,
+          initialChildSize: 0.45,
           minChildSize: 0.15,
           maxChildSize: 0.75,
           builder: (_, scrollController) {

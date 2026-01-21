@@ -19,4 +19,8 @@ class ProfileController extends ChangeNotifier {
     isLoading = false;
     notifyListeners();
   }
+
+  Future<void> logout() async {
+    await authService.logout();
+  }
 }

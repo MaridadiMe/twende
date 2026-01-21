@@ -173,6 +173,17 @@ class ProfileScreen extends StatelessWidget {
                       : 'Dark',
                   onTap: () {},
                 ),
+                _buildListTile(
+                  context: context,
+                  icon: Icons.logout,
+                  title: 'Logout',
+                  onTap: () {
+                    // Call your logout method
+                    controller.logout();
+                    // Optionally navigate to login screen or show a confirmation dialog
+                    Navigator.of(context).pushReplacementNamed('/login');
+                  },
+                ),
               ]),
             ),
 

@@ -7,7 +7,7 @@ import 'package:flutter_application_1/features/trips/services/trip_service.dart'
 
 class SearchTripController extends ChangeNotifier {
   final TripService tripService;
-  final MapControllerService mapService;
+  late final MapControllerService mapService;
 
   SearchTripController(this.tripService, this.mapService);
 
@@ -76,6 +76,8 @@ class SearchTripController extends ChangeNotifier {
     pickupLat = lat;
     pickupLon = lon;
 
+    mapService.setPickupMarker(lat, lon);
+    mapService.clearRoutes();
     if (address != null) {
       pickupController.text = address;
       pickupController.selection = TextSelection.fromPosition(
@@ -83,7 +85,7 @@ class SearchTripController extends ChangeNotifier {
       );
     }
 
-    // mapService.moveCamera(lat, lon);
+    mapService.moveCamera(lat, lon);
 
     notifyListeners();
   }
@@ -103,17 +105,12 @@ class SearchTripController extends ChangeNotifier {
       );
     }
 
+    mapService.clearRoutes();
+
+    mapService.setDropMarker(lat, lon);
     if (pickUpAndDestinationValid) {
       mapService.drawRoute(pickupLat!, pickupLon!, dropLat!, dropLon!);
     }
-
-    // mapService.moveCamera(lat, lon);
-    mapService.drawRoute(
-      pickupLat!,
-      pickupLon!,
-      dropLat ?? lat,
-      dropLon ?? lon,
-    );
 
     notifyListeners();
   }

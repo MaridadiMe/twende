@@ -22,6 +22,12 @@ class _TripMapViewState extends State<TripMapView> {
     _initCurrentLocation();
   }
 
+  @override
+  void dispose() {
+    widget.mapService.dispose(); // Clean up map controller
+    super.dispose();
+  }
+
   Future<void> _initCurrentLocation() async {
     try {
       final position = await _getCurrentLocation();
@@ -76,14 +82,15 @@ class _TripMapViewState extends State<TripMapView> {
         zoom: 15,
       ),
       polylines: widget.mapService.polylines,
+      markers: widget.mapService.markers,
       onMapCreated: (controller) {
         if (!widget.mapService.controller.isCompleted) {
           widget.mapService.controller.complete(controller);
         }
       },
       myLocationEnabled: true,
-      myLocationButtonEnabled: true,
-      zoomControlsEnabled: true,
+      myLocationButtonEnabled: false,
+      zoomControlsEnabled: false,
       compassEnabled: true,
       mapToolbarEnabled: false,
     );
