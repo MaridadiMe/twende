@@ -93,19 +93,19 @@ flutter:
           weight: 700
 
 flutter_native_splash:
-  color: "#0B1C2D" # Deep navy background
+  color: "#00357A" # Deep navy background
 
-  image: assets/images/splash_logo.png # Logo shown in center
-  branding: assets/images/branding.png # Text logo at bottom
+  image: assets/images/yaTown.png # Logo shown in center
+  # branding: assets/images/rosemLabs.png # Text logo at bottom
 
   android: true
   ios: true
   web: true
 
   android_12:
-    color: "#0B1C2D"
-    image: assets/images/shuttle_splash_logo.png
-    branding: assets/images/branding.png
+    color: "#00357A"
+    image: assets/images/yaTown.png
+    # branding: assets/images/rosemLabs.png
 
   android_gravity: center
   ios_content_mode: center

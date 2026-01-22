@@ -6,16 +6,21 @@ final ThemeData darkTheme = ThemeData(
   useMaterial3: true,
   fontFamily: 'Inter',
 
+  // Core
   primaryColor: AppColors.primary,
   scaffoldBackgroundColor: AppColors.darkBg,
 
-  colorScheme: ColorScheme.dark(
-    primary: AppColors.accent,
-    secondary: AppColors.secondary,
+  colorScheme: const ColorScheme.dark(
+    primary: AppColors.primary,
+    secondary: AppColors.accent,
     surface: AppColors.darkSurface,
     error: AppColors.error,
+    onPrimary: Colors.white,
+    onSecondary: Colors.white,
+    onSurface: Colors.white70,
   ),
 
+  // AppBar
   appBarTheme: const AppBarTheme(
     backgroundColor: AppColors.darkSurface,
     foregroundColor: Colors.white,
@@ -23,18 +28,38 @@ final ThemeData darkTheme = ThemeData(
     centerTitle: true,
   ),
 
-  cardTheme: CardThemeData(
-    color: AppColors.darkSurface,
-    elevation: 1,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-  ),
+  // Cards
+  // cardTheme: CardTheme(
+  //   color: AppColors.darkSurface,
+  //   elevation: 1,
+  //   shape: RoundedRectangleBorder(
+  //     borderRadius: BorderRadius.circular(16),
+  //   ),
+  // ),
 
+  // Buttons
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
-      backgroundColor: AppColors.accent,
+      backgroundColor: AppColors.primary,
       foregroundColor: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       padding: const EdgeInsets.symmetric(vertical: 14),
+      textStyle: const TextStyle(fontWeight: FontWeight.w600),
     ),
+  ),
+
+  // Inputs
+  inputDecorationTheme: InputDecorationTheme(
+    filled: true,
+    fillColor: AppColors.darkSurface,
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(14),
+      borderSide: BorderSide.none,
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(14),
+      borderSide: const BorderSide(color: AppColors.primary, width: 2),
+    ),
+    hintStyle: TextStyle(color: Colors.white54),
   ),
 );

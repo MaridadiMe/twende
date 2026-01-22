@@ -25,6 +25,7 @@ class ProfileScreen extends StatelessWidget {
     required String title,
     String? subtitle,
     VoidCallback? onTap,
+    bool? showTrailing,
   }) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -43,10 +44,12 @@ class ProfileScreen extends StatelessWidget {
                 ).textTheme.bodySmall?.copyWith(color: Colors.grey.shade500),
               )
             : null,
-        trailing: Icon(
-          Icons.chevron_right,
-          color: Theme.of(context).colorScheme.primary,
-        ),
+        trailing: (showTrailing ?? true)
+            ? Icon(
+                Icons.chevron_right,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+              )
+            : null,
         onTap: onTap,
       ),
     );
@@ -183,6 +186,7 @@ class ProfileScreen extends StatelessWidget {
                     // Optionally navigate to login screen or show a confirmation dialog
                     Navigator.of(context).pushReplacementNamed('/login');
                   },
+                  showTrailing: false,
                 ),
               ]),
             ),

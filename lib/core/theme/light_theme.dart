@@ -6,35 +6,57 @@ final ThemeData lightTheme = ThemeData(
   useMaterial3: true,
   fontFamily: 'Inter',
 
+  // Core
   primaryColor: AppColors.primary,
   scaffoldBackgroundColor: AppColors.lightBg,
 
-  colorScheme: ColorScheme.light(
+  colorScheme: const ColorScheme.light(
     primary: AppColors.primary,
     secondary: AppColors.accent,
     surface: AppColors.lightSurface,
     error: AppColors.error,
+    onPrimary: Colors.white,
+    onSecondary: Colors.white,
+    onSurface: Colors.black87,
   ),
 
+  // AppBar
   appBarTheme: const AppBarTheme(
-    backgroundColor: AppColors.lightSurface,
-    foregroundColor: AppColors.primary,
+    backgroundColor: AppColors.primary, // #00357A
+    foregroundColor: Colors.white,
     elevation: 0,
     centerTitle: true,
   ),
 
-  cardTheme: CardThemeData(
-    color: AppColors.lightSurface,
-    elevation: 2,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-  ),
+  // Cards
+  // cardTheme: CardTheme(
+  //   color: AppColors.lightSurface,
+  //   elevation: 2,
+  //   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+  // ),
 
+  // Buttons
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
       backgroundColor: AppColors.primary,
       foregroundColor: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       padding: const EdgeInsets.symmetric(vertical: 14),
+      textStyle: const TextStyle(fontWeight: FontWeight.w600),
+    ),
+  ),
+
+  // Inputs (recommended addition)
+  inputDecorationTheme: InputDecorationTheme(
+    filled: true,
+    fillColor: AppColors.lightSurface,
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(14),
+      borderSide: BorderSide.none,
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(14),
+      borderSide: const BorderSide(color: AppColors.primary, width: 2),
     ),
   ),
 );
