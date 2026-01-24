@@ -1,4 +1,7 @@
 import 'dart:async';
+import 'dart:math';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -7,8 +10,11 @@ class MapControllerService {
   final PolylinePoints polylinePoints;
   final String apiKey;
 
-  Set<Polyline> polylines = {};
-  final Set<Marker> markers = {};
+  Set<Marker> get markers => _markers; // getter only
+  Set<Polyline> get polylines => _polylines;
+
+  final Set<Marker> _markers = {};
+  final Set<Polyline> _polylines = {};
 
   MapControllerService(this.apiKey)
     : polylinePoints = PolylinePoints(apiKey: apiKey);
@@ -32,26 +38,33 @@ class MapControllerService {
       ),
     );
 
-    if (result.points.isEmpty) return;
-
-    polylines = {
-      Polyline(
+    if (result.points.isNotEmpty) {
+      final newPolyline = Polyline(
         polylineId: const PolylineId('route'),
         width: 5,
+        color: Colors.blue, // ← add if missing
         points: result.points
             .map((p) => LatLng(p.latitude, p.longitude))
             .toList(),
-      ),
-    };
+      );
+
+      _polylines.clear();
+      _polylines.add(newPolyline);
+
+      await fitToRoute(startLat, startLng, endLat, endLng);
+    } else {
+      _polylines.clear();
+      debugPrint('No route points received');
+    }
   }
 
   void clearRoutes() {
-    polylines.clear();
+    _polylines.clear();
   }
 
   void setPickupMarker(double lat, double lon) {
-    markers.removeWhere((m) => m.markerId.value == 'pickup');
-    markers.add(
+    _markers.removeWhere((m) => m.markerId.value == 'pickup');
+    _markers.add(
       Marker(
         markerId: const MarkerId('pickup'),
         position: LatLng(lat, lon),
@@ -62,9 +75,8 @@ class MapControllerService {
   }
 
   void setDropMarker(double lat, double lon) {
-    markers.removeWhere((m) => m.markerId.value == 'drop');
-
-    markers.add(
+    _markers.removeWhere((m) => m.markerId.value == 'drop');
+    _markers.add(
       Marker(
         markerId: const MarkerId('drop'),
         position: LatLng(lat, lon),
@@ -79,5 +91,21 @@ class MapControllerService {
       final futureController = await controller.future;
       futureController.dispose();
     }
+  }
+
+  Future<void> fitToRoute(
+    double pickupLat,
+    double pickupLon,
+    double dropLat,
+    double dropLon,
+  ) async {
+    final c = await controller.future;
+
+    final bounds = LatLngBounds(
+      southwest: LatLng(min(pickupLat, dropLat), min(pickupLon, dropLon)),
+      northeast: LatLng(max(pickupLat, dropLat), max(pickupLon, dropLon)),
+    );
+
+    c.animateCamera(CameraUpdate.newLatLngBounds(bounds, 80)); // padding
   }
 }

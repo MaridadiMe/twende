@@ -68,33 +68,60 @@ class SearchTripController extends ChangeNotifier {
       dropLat != null &&
       dropLon != null;
 
-  void setPickupLocation({
-    required double lat,
-    required double lon,
-    String? address,
-  }) {
-    pickupLat = lat;
-    pickupLon = lon;
+  // void setPickupLocation({
+  //   required double lat,
+  //   required double lon,
+  //   String? address,
+  // }) {
+  //   pickupLat = lat;
+  //   pickupLon = lon;
 
-    mapService.setPickupMarker(lat, lon);
-    mapService.clearRoutes();
-    if (address != null) {
-      pickupController.text = address;
-      pickupController.selection = TextSelection.fromPosition(
-        TextPosition(offset: pickupController.text.length),
-      );
-    }
+  //   mapService.setPickupMarker(lat, lon);
+  //   // mapService.clearRoutes();
+  //   if (address != null) {
+  //     pickupController.text = address;
+  //     pickupController.selection = TextSelection.fromPosition(
+  //       TextPosition(offset: pickupController.text.length),
+  //     );
+  //   }
 
-    mapService.moveCamera(lat, lon);
+  //   mapService.moveCamera(lat, lon);
 
-    notifyListeners();
-  }
+  //   notifyListeners();
+  // }
+
+  // void setDropLocation({
+  //   required double lat,
+  //   required double lon,
+  //   String? address,
+  // }) async {
+  //   dropLat = lat;
+  //   dropLon = lon;
+
+  //   if (address != null) {
+  //     destinationController.text = address;
+  //     destinationController.selection = TextSelection.fromPosition(
+  //       TextPosition(offset: destinationController.text.length),
+  //     );
+  //   }
+
+  //   // mapService.clearRoutes();
+
+  //   mapService.setDropMarker(lat, lon);
+  //   if (pickUpAndDestinationValid) {
+  //     debugPrint('Drawing route on map');
+  //     await mapService.drawRoute(pickupLat!, pickupLon!, dropLat!, dropLon!);
+  //   }
+
+  //   notifyListeners();
+  // }
 
   void setDropLocation({
     required double lat,
     required double lon,
     String? address,
-  }) {
+  }) async {
+    // ← make async
     dropLat = lat;
     dropLon = lon;
 
@@ -105,11 +132,38 @@ class SearchTripController extends ChangeNotifier {
       );
     }
 
-    mapService.clearRoutes();
-
     mapService.setDropMarker(lat, lon);
+
     if (pickUpAndDestinationValid) {
-      mapService.drawRoute(pickupLat!, pickupLon!, dropLat!, dropLon!);
+      debugPrint('Drawing route...');
+      await mapService.drawRoute(pickupLat!, pickupLon!, dropLat!, dropLon!);
+    }
+    notifyListeners(); // ← crucial — this tells Consumer/Listener to rebuild
+  }
+
+  void setPickupLocation({
+    required double lat,
+    required double lon,
+    String? address,
+  }) async {
+    pickupLat = lat;
+    pickupLon = lon;
+
+    mapService.setPickupMarker(lat, lon);
+
+    if (address != null) {
+      pickupController.text = address;
+      pickupController.selection = TextSelection.fromPosition(
+        TextPosition(offset: pickupController.text.length),
+      );
+    }
+
+    mapService.moveCamera(lat, lon);
+
+    // If drop is already set → draw route automatically
+    if (dropLat != null && dropLon != null) {
+      debugPrint('Pickup changed → redrawing route');
+      await mapService.drawRoute(lat, lon, dropLat!, dropLon!);
     }
 
     notifyListeners();

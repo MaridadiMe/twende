@@ -52,7 +52,13 @@ class _SearchTripPageState extends State<SearchTripPage> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        TripMapView(mapService), // Your map widget
+        AnimatedBuilder(
+          // ← add this
+          animation: controller,
+          builder: (context, _) {
+            return TripMapView(mapService);
+          },
+        ), // Your map widget
         DraggableScrollableSheet(
           initialChildSize: 0.45,
           minChildSize: 0.15,

@@ -40,10 +40,7 @@ class SearchFormSheet extends StatelessWidget {
             prefixIcon: const Icon(Icons.location_on),
             filled: true,
             fillColor: Colors.grey[100],
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
+            border: OutlineInputBorder(),
           ),
           debounceTime: 400,
           countries: const ["tz"], // Tanzania
@@ -72,10 +69,7 @@ class SearchFormSheet extends StatelessWidget {
             prefixIcon: const Icon(Icons.my_location),
             filled: true,
             fillColor: Colors.grey[100],
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
+            border: OutlineInputBorder(),
           ),
           debounceTime: 400,
           countries: const ["tz"],

@@ -75,6 +75,9 @@ class _TripMapViewState extends State<TripMapView> {
 
   @override
   Widget build(BuildContext context) {
+    print(
+      "Map widget rebuilt → markers count: ${widget.mapService.markers.length}",
+    );
     return GoogleMap(
       mapType: MapType.normal,
       initialCameraPosition: CameraPosition(

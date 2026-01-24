@@ -47,16 +47,16 @@ final ThemeData lightTheme = ThemeData(
   ),
 
   // Inputs (recommended addition)
-  inputDecorationTheme: InputDecorationTheme(
-    filled: true,
-    fillColor: AppColors.lightSurface,
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(14),
-      borderSide: BorderSide.none,
-    ),
-    focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(14),
-      borderSide: const BorderSide(color: AppColors.primary, width: 2),
-    ),
-  ),
+  // inputDecorationTheme: InputDecorationTheme(
+  //   filled: true,
+  //   fillColor: AppColors.lightSurface,
+  //   border: OutlineInputBorder(
+  //     borderRadius: BorderRadius.circular(14),
+  //     borderSide: BorderSide.none,
+  //   ),
+  //   focusedBorder: OutlineInputBorder(
+  //     borderRadius: BorderRadius.circular(10),
+  //     borderSide: const BorderSide(color: AppColors.primary, width: 1),
+  //   ),
+  // ),
 );
