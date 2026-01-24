@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/core/api/api_client.dart';
-import 'package:flutter_application_1/features/trips/models/trip.dart';
 import 'package:flutter_application_1/features/trips/screens/search_trip/bottom_sheet_views/hybrid_search_form_sheet.dart';
-import 'package:flutter_application_1/features/trips/screens/search_trip/bottom_sheet_views/search_form_sheet.dart';
 import 'package:flutter_application_1/features/trips/screens/search_trip/bottom_sheet_views/sheet_switcher.dart';
 import 'package:flutter_application_1/features/trips/screens/search_trip/bottom_sheet_views/trip_details_sheet.dart';
 import 'package:flutter_application_1/features/trips/screens/search_trip/bottom_sheet_views/trip_results_sheet.dart';

@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/features/trips/enums/bottom_sheet_view.enum.dart';
 import 'package:flutter_application_1/features/trips/models/trip.dart';
@@ -94,54 +93,6 @@ class SearchTripController extends ChangeNotifier {
     showCustomSearch = value;
     notifyListeners();
   }
-
-  // void setPickupLocation({
-  //   required double lat,
-  //   required double lon,
-  //   String? address,
-  // }) {
-  //   pickupLat = lat;
-  //   pickupLon = lon;
-
-  //   mapService.setPickupMarker(lat, lon);
-  //   // mapService.clearRoutes();
-  //   if (address != null) {
-  //     pickupController.text = address;
-  //     pickupController.selection = TextSelection.fromPosition(
-  //       TextPosition(offset: pickupController.text.length),
-  //     );
-  //   }
-
-  //   mapService.moveCamera(lat, lon);
-
-  //   notifyListeners();
-  // }
-
-  // void setDropLocation({
-  //   required double lat,
-  //   required double lon,
-  //   String? address,
-  // }) async {
-  //   dropLat = lat;
-  //   dropLon = lon;
-
-  //   if (address != null) {
-  //     destinationController.text = address;
-  //     destinationController.selection = TextSelection.fromPosition(
-  //       TextPosition(offset: destinationController.text.length),
-  //     );
-  //   }
-
-  //   // mapService.clearRoutes();
-
-  //   mapService.setDropMarker(lat, lon);
-  //   if (pickUpAndDestinationValid) {
-  //     debugPrint('Drawing route on map');
-  //     await mapService.drawRoute(pickupLat!, pickupLon!, dropLat!, dropLon!);
-  //   }
-
-  //   notifyListeners();
-  // }
 
   void setDropLocation({
     required double lat,
@@ -268,7 +219,7 @@ class SearchTripController extends ChangeNotifier {
       await tripService.bookTrip(seats: 1, tripId: trip.id);
 
       return true;
-    } on DioException catch (e) {
+    } catch (e) {
       return false;
     } finally {
       isLoading = false;
