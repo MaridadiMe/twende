@@ -43,27 +43,33 @@ class ApiClient {
     if (token != null) {
       options.headers['Authorization'] = 'Bearer $token';
     }
-    // debugPrint('➡️ REQUEST');
-    // debugPrint('${options.method} ${options.uri}');
-    // debugPrint('Headers: ${options.headers}');
-    // debugPrint('Query: ${options.queryParameters}');
-    // debugPrint('Body: ${options.data}');
+    if (kDebugMode) {
+      debugPrint('➡️ REQUEST');
+      debugPrint('${options.method} ${options.uri}');
+      debugPrint('Headers: ${options.headers}');
+      debugPrint('Query: ${options.queryParameters}');
+      debugPrint('Body: ${options.data}');
+    }
     handler.next(options);
   }
 
   void _onResponse(Response response, ResponseInterceptorHandler handler) {
-    // debugPrint('⬅️ OK');
-    // debugPrint('URL: ${response.requestOptions.uri}');
-    // debugPrint('Status: ${response.statusCode}');
-    // debugPrint('Data: ${response.data}');
+    if (kDebugMode) {
+      debugPrint('⬅️ OK');
+      debugPrint('URL: ${response.requestOptions.uri}');
+      debugPrint('Status: ${response.statusCode}');
+      debugPrint('Data: ${response.data}');
+    }
     handler.next(response);
   }
 
   void _onError(DioException error, ErrorInterceptorHandler handler) {
-    debugPrint('❌ ERROR');
-    // debugPrint('URL: ${error.requestOptions.uri}');
-    // debugPrint('Message: ${extractErrorMessage(error)}');
-    // debugPrint('Raw: ${error.response?.data}');
+    if (kDebugMode) {
+      debugPrint('❌ ERROR');
+      debugPrint('URL: ${error.requestOptions.uri}');
+      debugPrint('Message: ${error.message}');
+      debugPrint('Response: ${error.response?.data}');
+    }
     handler.next(error);
   }
 }

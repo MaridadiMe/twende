@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/features/trips/screens/search_trip/map_layer/map_controller_service.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geolocator/geolocator.dart';
 
 class TripMapView extends StatefulWidget {
   final MapControllerService mapService;
@@ -30,7 +29,7 @@ class _TripMapViewState extends State<TripMapView> {
 
   Future<void> _initCurrentLocation() async {
     try {
-      final position = await _getCurrentLocation();
+      final position = await widget.mapService.getCurrentLocation();
 
       setState(() {
         _currentLocation = LatLng(position.latitude, position.longitude);
@@ -45,39 +44,36 @@ class _TripMapViewState extends State<TripMapView> {
     }
   }
 
-  Future<Position> _getCurrentLocation() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      throw Exception('Location services are disabled.');
-    }
+  // Future<Position> _getCurrentLocation() async {
+  //   bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  //   if (!serviceEnabled) {
+  //     throw Exception('Location services are disabled.');
+  //   }
 
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        throw Exception('Location permissions are denied');
-      }
-    }
+  //   LocationPermission permission = await Geolocator.checkPermission();
+  //   if (permission == LocationPermission.denied) {
+  //     permission = await Geolocator.requestPermission();
+  //     if (permission == LocationPermission.denied) {
+  //       throw Exception('Location permissions are denied');
+  //     }
+  //   }
 
-    if (permission == LocationPermission.deniedForever) {
-      throw Exception('Location permissions are permanently denied.');
-    }
+  //   if (permission == LocationPermission.deniedForever) {
+  //     throw Exception('Location permissions are permanently denied.');
+  //   }
 
-    final locationSettings = LocationSettings(
-      accuracy: LocationAccuracy.best, // replaces desiredAccuracy
-      distanceFilter: 0, // optional, min distance for updates
-    );
+  //   final locationSettings = LocationSettings(
+  //     accuracy: LocationAccuracy.best, // replaces desiredAccuracy
+  //     distanceFilter: 0, // optional, min distance for updates
+  //   );
 
-    return await Geolocator.getCurrentPosition(
-      locationSettings: locationSettings,
-    );
-  }
+  //   return await Geolocator.getCurrentPosition(
+  //     locationSettings: locationSettings,
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
-    print(
-      "Map widget rebuilt → markers count: ${widget.mapService.markers.length}",
-    );
     return GoogleMap(
       mapType: MapType.normal,
       initialCameraPosition: CameraPosition(

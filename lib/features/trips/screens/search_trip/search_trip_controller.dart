@@ -4,6 +4,7 @@ import 'package:flutter_application_1/features/trips/enums/bottom_sheet_view.enu
 import 'package:flutter_application_1/features/trips/models/trip.dart';
 import 'package:flutter_application_1/features/trips/screens/search_trip/map_layer/map_controller_service.dart';
 import 'package:flutter_application_1/features/trips/services/trip_service.dart';
+import 'package:geolocator/geolocator.dart';
 
 class SearchTripController extends ChangeNotifier {
   final TripService tripService;
@@ -55,6 +56,25 @@ class SearchTripController extends ChangeNotifier {
     }
   }
 
+  Future<List<Trip>> fetchNearbyTrips() async {
+    try {
+      final Position position = await mapService.getCurrentLocation();
+      pickupLat = position.latitude;
+      pickupLon = position.longitude;
+
+      final nearbyTrips = await tripService.getNearbyTrips(
+        pickupLat: pickupLat!,
+        pickupLon: pickupLon!, // now always non-null
+      );
+      return nearbyTrips;
+    } catch (e) {
+      debugPrint('Nearby trips fetch error: $e');
+      return []; // or return [] and show error in UI
+    } finally {
+      isLoading = false;
+    }
+  }
+
   bool get isFormValid =>
       pickupLat != null &&
       pickupLon != null &&
@@ -67,6 +87,13 @@ class SearchTripController extends ChangeNotifier {
       pickupLon != null &&
       dropLat != null &&
       dropLon != null;
+
+  bool showCustomSearch = false; // default: show nearby list
+
+  void toggleSearchMode(bool value) {
+    showCustomSearch = value;
+    notifyListeners();
+  }
 
   // void setPickupLocation({
   //   required double lat,

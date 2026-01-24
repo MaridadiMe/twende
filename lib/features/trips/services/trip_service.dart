@@ -34,6 +34,25 @@ class TripService {
     return data.map((e) => Trip.fromJson(e)).toList();
   }
 
+  Future<List<Trip>> getNearbyTrips({
+    required double pickupLat,
+    required double pickupLon,
+  }) async {
+    final departureFrom = DateTime.now().toUtc();
+
+    final response = await _apiClient.dio.get(
+      '/api/v1/fms/trips/nearby',
+      queryParameters: {
+        'pickupLat': pickupLat,
+        'pickupLon': pickupLon,
+        'departureFrom': departureFrom.toIso8601String(),
+      },
+    );
+
+    final data = response.data['data'] as List;
+    return data.map((e) => Trip.fromJson(e)).toList();
+  }
+
   Future<Booking> bookTrip({required int seats, required String tripId}) async {
     final response = await _apiClient.dio.post(
       '/api/v1/fms/trips/$tripId/bookings',

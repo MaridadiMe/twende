@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/core/api/api_client.dart';
+import 'package:flutter_application_1/features/trips/models/trip.dart';
+import 'package:flutter_application_1/features/trips/screens/search_trip/bottom_sheet_views/hybrid_search_form_sheet.dart';
 import 'package:flutter_application_1/features/trips/screens/search_trip/bottom_sheet_views/search_form_sheet.dart';
 import 'package:flutter_application_1/features/trips/screens/search_trip/bottom_sheet_views/sheet_switcher.dart';
 import 'package:flutter_application_1/features/trips/screens/search_trip/bottom_sheet_views/trip_details_sheet.dart';
@@ -58,7 +60,8 @@ class _SearchTripPageState extends State<SearchTripPage> {
           builder: (context, _) {
             return TripMapView(mapService);
           },
-        ), // Your map widget
+        ),
+        // Your map widget
         DraggableScrollableSheet(
           initialChildSize: 0.45,
           minChildSize: 0.15,
@@ -80,7 +83,7 @@ class _SearchTripPageState extends State<SearchTripPage> {
                   child: SheetSwitcher(
                     currentView: controller.currentView,
                     scrollController: scrollController,
-                    buildSearchForm: (sc) => SearchFormSheet(
+                    buildSearchForm: (sc) => HybridSearchFormSheet(
                       controller: controller,
                       scrollController: sc,
                     ),
