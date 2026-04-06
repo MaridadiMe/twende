@@ -39,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
     tripService = TripService(apiClient);
     authService = AuthService(apiClient);
 
-    myTripsController = MyTripsController(apiClient, tripService);
+    myTripsController = MyTripsController(apiClient, tripService, authService);
     profileController = ProfileController(authService);
 
     _tabs = [

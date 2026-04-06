@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/core/api/api_client.dart';
+import 'package:flutter_application_1/features/auth/services/auth_service.dart';
 import 'package:flutter_application_1/features/trips/models/trip.dart';
 import 'package:flutter_application_1/features/trips/services/trip_service.dart';
 
 class MyTripsController extends ChangeNotifier {
   final ApiClient apiClient;
   final TripService tripService;
+  final AuthService authService;
 
-  MyTripsController(this.apiClient, this.tripService);
+  MyTripsController(this.apiClient, this.tripService, this.authService);
 
   List<Trip> userTrips = [];
   bool isLoading = false;
@@ -75,7 +77,7 @@ class MyTripsController extends ChangeNotifier {
     }
   }
 
-  Future<bool> payForTrip({
+  Future<bool> confirmTrip({
     required Trip trip,
     required String phoneNumber,
   }) async {
@@ -83,7 +85,11 @@ class MyTripsController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await tripService.payForTrip(tripId: trip.id, phoneNumber: phoneNumber);
+      await tripService.confirmTrip(
+        tripId: trip.id,
+        bookingId: trip.bookings?.first.id ?? '',
+        phoneNumber: phoneNumber,
+      );
       // Update trip status if needed
       return true;
     } catch (e) {

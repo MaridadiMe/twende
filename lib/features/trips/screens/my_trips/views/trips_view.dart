@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/core/theme/app_colors.dart';
 import 'package:flutter_application_1/features/trips/screens/my_trips/my_trips_controller.dart';
+import 'package:flutter_application_1/features/trips/screens/my_trips/views/payment_dialog.dart';
 
 class TripsView extends StatelessWidget {
   final MyTripsController controller;
@@ -101,7 +102,7 @@ class TripsView extends StatelessWidget {
                           const SizedBox(height: 4),
 
                           Text(
-                            "Trip: ${trip.status} | Booking: ${trip.bookings?.first.status}",
+                            "${trip.status}  |  ${trip.bookings?.first.status}",
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w500,
@@ -117,8 +118,7 @@ class TripsView extends StatelessWidget {
                               children: [
                                 const SizedBox(height: 8),
                                 Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     // Cancel button - secondary
                                     SizedBox(
@@ -163,48 +163,63 @@ class TripsView extends StatelessWidget {
 
                                     const SizedBox(width: 8),
 
-                                    // Pay button - primary action
-                                    // SizedBox(
-                                    //   width: 100,
-                                    //   height: 25,
-                                    //   child: ElevatedButton(
-                                    //     onPressed: () async {
-                                    //       final success = await controller
-                                    //           .payForTrip(
-                                    //             trip: trip,
-                                    //             phoneNumber: '123',
-                                    //           );
-                                    //       if (success) {
-                                    //         ScaffoldMessenger.of(
-                                    //           context,
-                                    //         ).showSnackBar(
-                                    //           const SnackBar(
-                                    //             content: Text(
-                                    //               'Payment successful',
-                                    //             ),
-                                    //           ),
-                                    //         );
-                                    //       }
-                                    //     },
-                                    //     style: ElevatedButton.styleFrom(
-                                    //       backgroundColor: AppColors.primary,
-                                    //       shape: RoundedRectangleBorder(
-                                    //         borderRadius: BorderRadius.circular(
-                                    //           4,
-                                    //         ),
-                                    //       ),
-                                    //       padding: EdgeInsets.zero,
-                                    //     ),
-                                    //     child: const Text(
-                                    //       'Confirm',
-                                    //       style: TextStyle(
-                                    //         fontSize: 12,
-                                    //         fontWeight: FontWeight.w600,
-                                    //         color: Colors.white,
-                                    //       ),
-                                    //     ),
-                                    //   ),
-                                    // ),
+                                    //Pay button - primary action
+                                    SizedBox(
+                                      width: 100,
+                                      height: 25,
+                                      child: ElevatedButton(
+                                        onPressed: () async {
+                                          final currentUser = await controller
+                                              .authService
+                                              .getCurrentUser();
+                                          final phoneFromJwt = currentUser
+                                              ?.phone; // already decoded
+
+                                          final result = await showDialog<bool>(
+                                            context: context,
+                                            builder: (context) => PaymentDialog(
+                                              initialPhone: phoneFromJwt!,
+                                              onConfirm: (phone) async {
+                                                return await controller
+                                                    .confirmTrip(
+                                                      trip: trip,
+                                                      phoneNumber: phone,
+                                                    );
+                                              },
+                                            ),
+                                          );
+
+                                          if (result == true) {
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                  'Payment Submitted Successfully',
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: AppColors.primary,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              4,
+                                            ),
+                                          ),
+                                          padding: EdgeInsets.zero,
+                                        ),
+                                        child: const Text(
+                                          'Confirm',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ],

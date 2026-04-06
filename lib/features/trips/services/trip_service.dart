@@ -63,7 +63,7 @@ class TripService {
     return Booking.fromJson(data);
   }
 
-  // MOCK cancelTrip
+  //  cancelTrip
   Future<bool> cancelTrip({
     required String tripId,
     required String bookingId,
@@ -74,14 +74,15 @@ class TripService {
     return true;
   }
 
-  // MOCK payForTrip
-  Future<bool> payForTrip({
+  //  confirmTrip
+  Future<bool> confirmTrip({
     required String tripId,
+    required String bookingId,
     required String phoneNumber,
   }) async {
-    // simulate network delay
-    await Future.delayed(const Duration(milliseconds: 500));
-    // just return true to simulate success
+    await _apiClient.dio.post(
+      '/api/v1/fms/trips/$tripId/bookings/$bookingId/pay?paymentMobileNumber=$phoneNumber',
+    );
     return true;
   }
 

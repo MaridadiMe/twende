@@ -33,7 +33,7 @@ Future<void> _initializeApp() async {
     //]);
 
     // Optional: artificial minimum delay (only if everything else is < 1.5 s)
-    await Future.delayed(const Duration(seconds: 1));
+    await Future.delayed(const Duration(seconds: 2));
   } catch (e, stack) {
     // Very important in production!
     // log to Crashlytics / Sentry / your backend
