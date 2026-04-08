@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/core/theme/app_colors.dart';
 import 'package:flutter_application_1/features/trips/components/trip_search_result_item.dart';
 import 'package:flutter_application_1/features/trips/enums/bottom_sheet_view.enum.dart';
 import 'package:flutter_application_1/features/trips/screens/search_trip/search_trip_controller.dart';

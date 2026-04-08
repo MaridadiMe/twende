@@ -24,7 +24,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _confirmPasswordController = TextEditingController();
 
   bool _isLoading = false;
-  String? _errorMessage;
+  // String? _errorMessage;
 
   final authService = AuthService(ApiClient());
 
