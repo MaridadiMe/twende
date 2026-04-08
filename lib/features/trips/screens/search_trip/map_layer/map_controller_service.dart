@@ -110,31 +110,62 @@ class MapControllerService {
     c.animateCamera(CameraUpdate.newLatLngBounds(bounds, 80)); // padding
   }
 
+  // Future<Position> getCurrentLocation() async {
+  //   bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  //   if (!serviceEnabled) {
+  //     throw Exception('Location services are disabled.');
+  //   }
+
+  //   LocationPermission permission = await Geolocator.checkPermission();
+  //   if (permission == LocationPermission.denied) {
+  //     permission = await Geolocator.requestPermission();
+  //     if (permission == LocationPermission.denied) {
+  //       throw Exception('Location permissions are denied');
+  //     }
+  //   }
+
+  //   if (permission == LocationPermission.deniedForever) {
+  //     throw Exception('Location permissions are permanently denied.');
+  //   }
+
+  //   final locationSettings = LocationSettings(
+  //     accuracy: LocationAccuracy.best, // replaces desiredAccuracy
+  //     distanceFilter: 0, // optional, min distance for updates
+  //   );
+
+  //   return await Geolocator.getCurrentPosition(
+  //     locationSettings: locationSettings,
+  //   );
+  // }
+
   Future<Position> getCurrentLocation() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
+      await Geolocator.openLocationSettings(); // better UX
       throw Exception('Location services are disabled.');
     }
 
     LocationPermission permission = await Geolocator.checkPermission();
+
+    // 🔥 HANDLE deniedForever FIRST
+    if (permission == LocationPermission.deniedForever) {
+      await Geolocator.openAppSettings();
+      throw Exception('Location permissions are permanently denied.');
+    }
+
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
+
       if (permission == LocationPermission.denied) {
         throw Exception('Location permissions are denied');
       }
     }
 
-    if (permission == LocationPermission.deniedForever) {
-      throw Exception('Location permissions are permanently denied.');
-    }
-
-    final locationSettings = LocationSettings(
-      accuracy: LocationAccuracy.best, // replaces desiredAccuracy
-      distanceFilter: 0, // optional, min distance for updates
-    );
-
     return await Geolocator.getCurrentPosition(
-      locationSettings: locationSettings,
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.best,
+        distanceFilter: 0,
+      ),
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/features/trips/screens/search_trip/map_layer/map_controller_service.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class TripMapView extends StatefulWidget {
@@ -18,7 +19,10 @@ class _TripMapViewState extends State<TripMapView> {
   @override
   void initState() {
     super.initState();
-    _initCurrentLocation();
+    // _initCurrentLocation();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initCurrentLocation();
+    });
   }
 
   @override
@@ -41,36 +45,12 @@ class _TripMapViewState extends State<TripMapView> {
       }
     } catch (e) {
       debugPrint('Error fetching location: $e');
+
+      if (e.toString().contains('permanently denied')) {
+        Geolocator.openAppSettings();
+      }
     }
   }
-
-  // Future<Position> _getCurrentLocation() async {
-  //   bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  //   if (!serviceEnabled) {
-  //     throw Exception('Location services are disabled.');
-  //   }
-
-  //   LocationPermission permission = await Geolocator.checkPermission();
-  //   if (permission == LocationPermission.denied) {
-  //     permission = await Geolocator.requestPermission();
-  //     if (permission == LocationPermission.denied) {
-  //       throw Exception('Location permissions are denied');
-  //     }
-  //   }
-
-  //   if (permission == LocationPermission.deniedForever) {
-  //     throw Exception('Location permissions are permanently denied.');
-  //   }
-
-  //   final locationSettings = LocationSettings(
-  //     accuracy: LocationAccuracy.best, // replaces desiredAccuracy
-  //     distanceFilter: 0, // optional, min distance for updates
-  //   );
-
-  //   return await Geolocator.getCurrentPosition(
-  //     locationSettings: locationSettings,
-  //   );
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -87,7 +67,7 @@ class _TripMapViewState extends State<TripMapView> {
           widget.mapService.controller.complete(controller);
         }
       },
-      myLocationEnabled: true,
+      myLocationEnabled: _currentLocation != null,
       myLocationButtonEnabled: false,
       zoomControlsEnabled: false,
       compassEnabled: true,

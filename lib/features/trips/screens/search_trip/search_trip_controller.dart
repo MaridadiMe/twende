@@ -55,6 +55,13 @@ class SearchTripController extends ChangeNotifier {
     }
   }
 
+  Future<List<Trip>>? nearbyTripsFuture;
+
+  Future<void> loadNearbyTrips() async {
+    nearbyTripsFuture = fetchNearbyTrips();
+    notifyListeners();
+  }
+
   Future<List<Trip>> fetchNearbyTrips() async {
     try {
       final Position position = await mapService.getCurrentLocation();
