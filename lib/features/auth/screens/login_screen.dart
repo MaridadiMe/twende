@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/core/api/api_client.dart';
+import 'package:flutter_application_1/features/auth/classes/session_boostrap.dart';
 import 'package:flutter_application_1/features/auth/services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -37,7 +38,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (!mounted) return;
 
-      Navigator.pushReplacementNamed(context, '/home');
+      await SessionBootstrap.init();
+
+      Navigator.of(context).pushNamedAndRemoveUntil('/app', (route) => false);
     } catch (e) {
       setState(() {
         _errorMessage = 'Login failed. Please try again.';

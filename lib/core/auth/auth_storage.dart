@@ -1,3 +1,4 @@
+import 'package:flutter_application_1/features/auth/models/user.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decode/jwt_decode.dart';
 
@@ -21,6 +22,22 @@ class AuthStorage {
       return !Jwt.isExpired(token);
     } catch (_) {
       return false;
+    }
+  }
+
+  static Future<User?> getCurrentUser() async {
+    final token = await getToken();
+
+    if (token == null) {
+      return null;
+    }
+
+    try {
+      final payload = Jwt.parseJwt(token);
+
+      return User.fromJwt(payload);
+    } catch (_) {
+      return null;
     }
   }
 

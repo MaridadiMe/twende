@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
-import '../../core/auth/auth_storage.dart';
+import 'package:flutter_application_1/features/auth/classes/session_boostrap.dart';
+import 'package:flutter_application_1/features/auth/models/user.dart';
+import 'package:flutter_application_1/features/auth/screens/login_screen.dart';
+import 'package:flutter_application_1/features/home/main_shell.dart';
 
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key});
 
-  Future<bool> _isLoggedIn() async {
-    return await AuthStorage.isTokenValid();
+  Future<User?> _init() async {
+    return await SessionBootstrap.init();
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<bool>(
-      future: _isLoggedIn(),
+    return FutureBuilder<User?>(
+      future: _init(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
@@ -19,36 +22,12 @@ class AuthGate extends StatelessWidget {
           );
         }
 
-        if (snapshot.data == true) {
-          return const _Redirect(route: '/home');
-        } else {
-          return const _Redirect(route: '/login');
+        if (!snapshot.hasData) {
+          return const LoginScreen();
         }
+
+        return const MainShell();
       },
     );
-  }
-}
-
-class _Redirect extends StatefulWidget {
-  final String route;
-
-  const _Redirect({required this.route});
-
-  @override
-  State<_Redirect> createState() => _RedirectState();
-}
-
-class _RedirectState extends State<_Redirect> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Navigator.pushReplacementNamed(context, widget.route);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return const SizedBox.shrink();
   }
 }

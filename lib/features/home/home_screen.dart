@@ -40,7 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
     authService = AuthService(apiClient);
 
     myTripsController = MyTripsController(apiClient, tripService, authService);
-    profileController = ProfileController(authService);
+    profileController = ProfileController(authService)..init();
 
     _tabs = [
       SearchTripPage(onBookingSuccess: switchToMyTrips),
@@ -75,9 +75,9 @@ class _HomeScreenState extends State<HomeScreen> {
       myTripsController.refresh();
     }
 
-    if (index == 2) {
-      profileController.loadUser();
-    }
+    // if (index == 2) {
+    //   profileController.loadUser();
+    // }
   }
 
   @override

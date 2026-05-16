@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/features/auth/classes/app_state.dart';
+import 'package:flutter_application_1/features/auth/enums/app_mode.dart';
+import 'package:flutter_application_1/features/home/main_shell.dart';
 import 'package:flutter_application_1/features/profile/profile_controller.dart';
 
 class ProfileScreen extends StatelessWidget {
   final ProfileController controller;
 
   const ProfileScreen({super.key, required this.controller});
+
+  bool get canDrive => controller.user?.hasPermission('CREATE_TRIPS') ?? false;
 
   Widget _buildSectionTitle(BuildContext context, String title) {
     return Padding(
@@ -154,6 +159,37 @@ class ProfileScreen extends StatelessWidget {
 
             SliverToBoxAdapter(child: const SizedBox(height: 16)),
 
+            // Toggle Mode (only for drivers)
+            if (canDrive)
+              SliverToBoxAdapter(
+                child: _buildSectionTitle(context, 'App Mode'),
+              ),
+
+            if (canDrive)
+              SliverList(
+                delegate: SliverChildListDelegate([
+                  _buildListTile(
+                    context: context,
+                    icon: Icons.swap_horiz,
+                    title: AppState.mode == AppMode.driver
+                        ? 'Switch to Rider Mode'
+                        : 'Switch to Driver Mode',
+                    subtitle: 'Change how you use the app',
+                    onTap: () {
+                      final newMode = AppState.mode == AppMode.driver
+                          ? AppMode.rider
+                          : AppMode.driver;
+
+                      controller.switchMode(newMode);
+
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(builder: (_) => const MainShell()),
+                      );
+                    },
+                  ),
+                ]),
+              ),
+
             // 🔹 Other Settings Section
             SliverToBoxAdapter(
               child: _buildSectionTitle(context, 'Other Settings'),
@@ -180,13 +216,16 @@ class ProfileScreen extends StatelessWidget {
                   context: context,
                   icon: Icons.logout,
                   title: 'Logout',
-                  onTap: () {
-                    // Call your logout method
-                    controller.logout();
-                    // Optionally navigate to login screen or show a confirmation dialog
-                    Navigator.of(context).pushReplacementNamed('/login');
-                  },
                   showTrailing: false,
+                  onTap: () async {
+                    await controller.logout();
+
+                    if (!context.mounted) return;
+
+                    Navigator.of(
+                      context,
+                    ).pushNamedAndRemoveUntil('/login', (route) => false);
+                  },
                 ),
               ]),
             ),

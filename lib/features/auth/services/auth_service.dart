@@ -1,3 +1,6 @@
+import 'package:flutter_application_1/features/auth/classes/app_state.dart';
+import 'package:flutter_application_1/features/auth/classes/session_manager.dart';
+import 'package:flutter_application_1/features/auth/enums/app_mode.dart';
 import 'package:flutter_application_1/features/auth/models/register_user_dto.dart';
 import 'package:flutter_application_1/features/auth/models/request_otp_dto.dart';
 import 'package:flutter_application_1/features/auth/models/user.dart';
@@ -39,6 +42,8 @@ class AuthService {
 
   Future<void> logout() async {
     await AuthStorage.clear();
+    SessionManager.currentUser = null;
+    AppState.mode = AppMode.rider;
   }
 
   Future<void> verifyOtp(VerifyOtpDto payload) async {

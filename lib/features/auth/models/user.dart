@@ -5,6 +5,7 @@ class User {
   final String firstName;
   final String lastName;
   final String userName;
+  final String role;
   final List<String> permissions;
 
   User({
@@ -15,9 +16,14 @@ class User {
     required this.lastName,
     required this.userName,
     required this.permissions,
+    required this.role,
   });
 
   String get fullName => '$firstName $lastName';
+
+  bool hasPermission(String permission) {
+    return permissions.contains(permission);
+  }
 
   factory User.fromJwt(Map<String, dynamic> payload) {
     return User(
@@ -28,6 +34,7 @@ class User {
       lastName: payload['lastName'],
       userName: payload['userName'],
       permissions: List<String>.from(payload['permissions'] ?? []),
+      role: payload['role'],
     );
   }
 
@@ -40,6 +47,7 @@ class User {
       firstName: json['firstName'],
       lastName: json['lastName'],
       userName: json['userName'],
+      role: json['role'] ?? 'user',
       permissions: const [], // ❗ Not provided during registration
     );
   }
