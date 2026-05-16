@@ -1,4 +1,5 @@
 import 'package:flutter_application_1/features/booking/models/booking.dart';
+import 'package:flutter_application_1/features/trips/models/create_trip_request.dart';
 
 import '../../../core/api/api_client.dart';
 import '../models/trip.dart';
@@ -61,6 +62,12 @@ class TripService {
 
     final data = response.data['data'];
     return Booking.fromJson(data);
+  }
+
+  //  cancelTrip
+  Future<bool> createTrip(CreateTripRequest payload) async {
+    await _apiClient.dio.post('/api/v1/fms/trips', data: payload.toJson());
+    return true;
   }
 
   //  cancelTrip
