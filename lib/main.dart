@@ -4,7 +4,6 @@ import 'package:flutter_application_1/core/theme/light_theme.dart';
 import 'package:flutter_application_1/features/auth/auth_gate.dart';
 import 'package:flutter_application_1/features/auth/screens/login_screen.dart';
 import 'package:flutter_application_1/features/auth/screens/register_screen.dart';
-import 'package:flutter_application_1/features/home/home_screen.dart';
 import 'package:flutter_application_1/features/home/main_shell.dart';
 
 void main() async {
