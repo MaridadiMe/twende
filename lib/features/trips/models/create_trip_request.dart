@@ -1,5 +1,5 @@
 class CreateTripRequest {
-  final String driverId;
+  final String driverUserId;
 
   final double startLat;
   final double startLon;
@@ -17,7 +17,7 @@ class CreateTripRequest {
   final double price;
 
   CreateTripRequest({
-    required this.driverId,
+    required this.driverUserId,
     required this.startLat,
     required this.startLon,
     required this.startAddress,
@@ -32,7 +32,7 @@ class CreateTripRequest {
 
   Map<String, dynamic> toJson() {
     return {
-      'driverId': driverId,
+      'driverUserId': driverUserId,
       'startLat': startLat,
       'startLon': startLon,
       'startAddress': startAddress,

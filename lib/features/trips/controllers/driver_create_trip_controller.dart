@@ -9,7 +9,10 @@ class DriverCreateTripController extends BaseTripFormController {
   final TripService tripService;
 
   DriverCreateTripController(this.tripService, MapControllerService mapService)
-    : super(mapService);
+    : super(mapService) {
+    seatsController.addListener(notifyListeners);
+    priceController.addListener(notifyListeners);
+  }
 
   final seatsController = TextEditingController();
   final priceController = TextEditingController();
@@ -20,6 +23,13 @@ class DriverCreateTripController extends BaseTripFormController {
       seatsController.text.isNotEmpty &&
       priceController.text.isNotEmpty;
 
+  @override
+  void dispose() {
+    seatsController.dispose();
+    priceController.dispose();
+    super.dispose();
+  }
+
   Future<bool> createTrip() async {
     try {
       isLoading = true;
@@ -27,7 +37,7 @@ class DriverCreateTripController extends BaseTripFormController {
 
       await tripService.createTrip(
         CreateTripRequest(
-          driverId: SessionManager.currentUser!.id,
+          driverUserId: SessionManager.currentUser!.id,
 
           startLat: pickupLat!,
           startLon: pickupLon!,

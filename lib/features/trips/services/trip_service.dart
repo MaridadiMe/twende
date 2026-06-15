@@ -104,4 +104,16 @@ class TripService {
 
     return data.map<Trip>((trip) => Trip.fromJson(trip)).toList();
   }
+
+  Future<List<Trip>> getDriverTrips() async {
+    final response = await _apiClient.dio.get('/api/v1/fms/trips/driver');
+
+    final data = response.data['data'];
+
+    if (data == null || data is! List) {
+      return [];
+    }
+
+    return data.map<Trip>((trip) => Trip.fromJson(trip)).toList();
+  }
 }
