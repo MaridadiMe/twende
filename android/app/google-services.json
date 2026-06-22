@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1081348472782",
+    "project_id": "theta-ember-481820-t2",
+    "storage_bucket": "theta-ember-481820-t2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1081348472782:android:a96632bd32bf293ddd759f",
+        "android_client_info": {
+          "package_name": "com.rosemlabs.yatown"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1081348472782-g16brd6n6p077h3av8ehbq0vfb5ipuco.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rosemlabs.yatown",
+            "certificate_hash": "b5ddcaf006616543d34a575059e7495b5e8cea8a"
+          }
+        },
+        {
+          "client_id": "1081348472782-k4434uleovgubbj54c6mukbuj0dp5u01.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rosemlabs.yatown",
+            "certificate_hash": "c6d6e2a5ee9ea03e4e14ceb6e3133c62ce1a107d"
+          }
+        },
+        {
+          "client_id": "1081348472782-soe0eht3s0on2hl1pli7f5e4j5u5jgbv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBEJnHgZy5K5SoRWOjUCrMHD0JaLmc3Ol0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1081348472782-soe0eht3s0on2hl1pli7f5e4j5u5jgbv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

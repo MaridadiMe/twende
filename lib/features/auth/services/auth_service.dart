@@ -5,6 +5,7 @@ import 'package:flutter_application_1/features/auth/models/register_user_dto.dar
 import 'package:flutter_application_1/features/auth/models/request_otp_dto.dart';
 import 'package:flutter_application_1/features/auth/models/user.dart';
 import 'package:flutter_application_1/features/auth/models/verify_otp_dto.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:jwt_decode/jwt_decode.dart';
 
 import '../../../core/api/api_client.dart';
@@ -58,6 +59,30 @@ class AuthService {
       '/api/v1/iam/users/verify-phone',
       data: payload.toJson(),
     );
+  }
+
+  Future<void> googleLogin() async {
+    const serverClientId =
+        '1081348472782-soe0eht3s0on2hl1pli7f5e4j5u5jgbv.apps.googleusercontent.com';
+
+    final googleUser = await GoogleSignIn(
+      serverClientId: serverClientId,
+    ).signIn();
+    if (googleUser == null) throw Exception('Google sign-in cancelled');
+
+    final googleAuth = await googleUser.authentication;
+    final idToken = googleAuth.idToken;
+    if (idToken == null) throw Exception('Failed to get Google ID token');
+
+    final response = await _apiClient.dio.post(
+      '/api/v1/iam/auth/googleLogin',
+      data: {'idToken': idToken},
+    );
+
+    final token = response.data['data']['accessToken'];
+    if (token == null) throw Exception('Invalid Google login response');
+
+    await AuthStorage.saveToken(token);
   }
 
   /// 🔹 Get logged-in user from JWT

@@ -45,6 +45,18 @@
 		<true/>
 		<key>UIApplicationSupportsIndirectInputEvents</key>
 		<true/>
+		<key>CFBundleURLTypes</key>
+		<array>
+			<dict>
+				<key>CFBundleTypeRole</key>
+				<string>Editor</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<!-- Replace with REVERSED_CLIENT_ID from GoogleService-Info.plist -->
+					<string>YOUR_REVERSED_CLIENT_ID</string>
+				</array>
+			</dict>
+		</array>
 		<key>NSLocationWhenInUseUsageDescription</key>
 		<string>Your location is needed to show nearby trips</string>
 		<key>UIStatusBarHidden</key>

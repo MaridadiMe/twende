@@ -17,7 +17,33 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
 
   bool _isLoading = false;
+  bool _isGoogleLoading = false;
   String? _errorMessage;
+
+  void _loginWithGoogle() async {
+    setState(() {
+      _isGoogleLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final authService = AuthService(ApiClient());
+      await authService.googleLogin();
+
+      if (!mounted) return;
+
+      await SessionBootstrap.init();
+      Navigator.of(context).pushNamedAndRemoveUntil('/app', (route) => false);
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Google sign-in failed. Please try again.';
+      });
+    } finally {
+      setState(() {
+        _isGoogleLoading = false;
+      });
+    }
+  }
 
   void _login() async {
     if (!_formKey.currentState!.validate()) return;
@@ -113,6 +139,47 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
 
               const SizedBox(height: 16),
+
+              const SizedBox(height: 8),
+
+              // Divider
+              Row(
+                children: const [
+                  Expanded(child: Divider()),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8),
+                    child: Text('or'),
+                  ),
+                  Expanded(child: Divider()),
+                ],
+              ),
+
+              const SizedBox(height: 8),
+
+              // Google Sign-In Button
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: (_isLoading || _isGoogleLoading) ? null : _loginWithGoogle,
+                  icon: _isGoogleLoading
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text(
+                          'G',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF4285F4),
+                          ),
+                        ),
+                  label: const Text('Continue with Google'),
+                ),
+              ),
+
+              const SizedBox(height: 8),
 
               // Register Link
               TextButton(
