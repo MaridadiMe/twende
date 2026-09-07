@@ -62,12 +62,7 @@ class AuthService {
   }
 
   Future<void> googleLogin() async {
-    const serverClientId =
-        '1081348472782-soe0eht3s0on2hl1pli7f5e4j5u5jgbv.apps.googleusercontent.com';
-
-    final googleUser = await GoogleSignIn(
-      serverClientId: serverClientId,
-    ).signIn();
+    final googleUser = await GoogleSignIn().signIn();
     if (googleUser == null) throw Exception('Google sign-in cancelled');
 
     final googleAuth = await googleUser.authentication;

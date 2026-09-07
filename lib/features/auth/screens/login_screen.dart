@@ -36,7 +36,7 @@ class _LoginScreenState extends State<LoginScreen> {
       Navigator.of(context).pushNamedAndRemoveUntil('/app', (route) => false);
     } catch (e) {
       setState(() {
-        _errorMessage = 'Google sign-in failed. Please try again.';
+        _errorMessage = e.toString();
       });
     } finally {
       setState(() {
